@@ -56,7 +56,7 @@ class LocalizationModel(models.Model):
 
 class CategoryModel(models.Model):
     name = models.CharField(unique=True, max_length=15, blank=False, null=False)
-    description = models.CharField(max_length=100, defalut="")
+    description = models.CharField(max_length=100, default="")
 
     def __str__(self):
         return self.name
@@ -121,6 +121,17 @@ class CustomUserManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
         if not email:
             raise ValueError("The email must be set")
+        try:
+            name = extra_fields.get('first_name')
+            lname = extra_fields.get('last_name')
+            if len(name):
+                raise ValueError("first_name can not be empty")
+
+            if len(lname):
+                raise ValueError("last_name can not be empty")
+        except:
+            pass
+
         email = self.normalize_email(email)
         user = self.model(email = email, **extra_fields)
         user.set_password(password)
@@ -153,8 +164,8 @@ class CustomUserModel(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(default = timezone.now)
     first_name = models.CharField(max_length=15, blank=False, null=False)
     last_name = models.CharField(max_length=20, blank=False, null=False)
-    phone_number = models.CharField(min_length=9, max_length=9, blank=False, null=False)
-    localization = models.ForeignKey(LocalizationModel, default = None, on_delete= models.DO_NOTHING)
+    phone_number = models.CharField(max_length=9, blank=False, null=False)
+    localization = models.ForeignKey(LocalizationModel, blank=False, null=True, on_delete= models.DO_NOTHING)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
