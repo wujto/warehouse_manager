@@ -1,6 +1,7 @@
 from django.db import models
+from django.utils import timezone
 from django.contrib.auth.base_user import BaseUserManager
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
 class ProductSetModel(models.Model):
     id_number = models.CharField(max_length=9, unique=True, blank=False, null=False)
@@ -81,7 +82,7 @@ class ProductModel(models.Model):
     localization = models.ForeignKey(LocalizationModel, on_delete = models.DO_NOTHING, blank=False, null=False)
     photo = models.FileField()
     product_set = models.ForeignKey(ProductSetModel,on_delete = models.DO_NOTHING, null=True, blank=False)
-    product_user = models.ForeignKey("User",on_delete = models.DO_NOTHING, blank=False, null=True)
+    product_user = models.ForeignKey("CustomUserModel",on_delete = models.DO_NOTHING, blank=False, null=True)
 
     def __str__(self):
         return f'{self.id_number} {self.name}'
@@ -100,7 +101,7 @@ class ProductModel(models.Model):
 
         return info
 
-# Edit name, description, category, localization
+    # Edit name, description, category, localization
     def edit_info(self, info):
         self.name = info['name']
         self.description = info['description']
@@ -116,8 +117,7 @@ class ProductModel(models.Model):
     def set_product_user(self, user):
         self.product_user = user
 
-
-class CustomeUserManager(BaseUserManager):
+class CustomUserManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
         if not email:
             raise ValueError("The email must be set")
@@ -131,10 +131,57 @@ class CustomeUserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
+        extra_fields.setdefault('is_admin', True)
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser must have is_staff = True')
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser = True')
+        if extra_fields.get('is_admin') is not True:
+            raise ValueError('Superuser must have is_admin = True')
 
         return self.create_user(email, password, **extra_fields)
+
+class CustomUserModel(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField('email adress', unique= True)
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    date_joined = models.DateTimeField(default = timezone.now)
+    first_name = models.CharField(max_length=15, blank=False, null=False)
+    last_name = models.CharField(max_length=20, blank=False, null=False)
+    phone_number = models.CharField(min_length=9, max_length=9, blank=False, null=False)
+    localization = models.ForeignKey(LocalizationModel, default = None, on_delete= models.DO_NOTHING)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()
+
+    def __str__(self):
+        return f'{self.first_name} {self.last_name} | {self.email}'
+
+    def get_email(self):
+        return self.email
+
+    def get_first_name(self):
+        return self.first_name
+    
+    def get_last_name(self):
+        return self.last_name
+
+    def get_is_staff(self):
+        return self.is_staff
+
+    def get_is_admin(self):
+        return self.is_admin
+
+    def get_phone_number(self):
+        return self.phone_number
+
+    def get_localization(self):
+        if self.localization:
+            return self.localization
+        
+        return "That user have not set localization yet"
