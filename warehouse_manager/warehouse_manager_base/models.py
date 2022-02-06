@@ -132,6 +132,7 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
         extra_fields.setdefault('is_admin', True)
+        extra_fields.setdefault('is_manager', True)
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser must have is_staff = True')
@@ -144,9 +145,10 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUserModel(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField('email adress', unique= True)
-    is_staff = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
+    is_manager = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default = timezone.now)
     first_name = models.CharField(max_length=15, blank=False, null=False)
@@ -177,6 +179,9 @@ class CustomUserModel(AbstractBaseUser, PermissionsMixin):
     def get_is_admin(self):
         return self.is_admin
 
+    def get_is_manager(self):
+        return self.is_manager
+
     def get_phone_number(self):
         return self.phone_number
 
@@ -185,3 +190,56 @@ class CustomUserModel(AbstractBaseUser, PermissionsMixin):
             return self.localization
         
         return "That user have not set localization yet"
+
+    def get_products(self):
+        products = self.productmodel_set.all()
+        return products
+
+    def set_phone_number(self, number):
+        if len(number) < 9:
+            raise ValueError("Invalid number length, number to short")
+        elif len(number) > 9:
+            raise ValueError("Invalid number length, number to long")
+
+        self.phone_number = number
+
+        return self.phone_number
+
+    def set_first_name(self, name):
+        if len(name):
+            self.first_name = name
+        else:
+            raise ValueError("Name can not be empty!!")
+
+        return self.first_name
+
+    def set_last_name(self, last_name):
+        if len(last_name):
+            self.last_name = last_name
+        else:
+            raise ValueError("Last name can not be empty")
+
+        return self.last_name
+
+    def set_is_admin(self, admin):
+        self.is_admin = admin
+        return self.is_admin
+
+    def set_is_manager(self, manager):
+        self.is_manager = manager
+        return self.is_manager
+
+    def set_email(self, email):
+        try:
+            CustomUserModel.objects.get(email= email)
+        except:
+            raise ValueError('User with that email is already exist')
+
+        self.email = email
+
+    def set_localization(self, localization):
+        if isinstance(localization, LocalizationModel):
+            self.localization = localization
+        else:
+            raise ValueError('')
+        return self.localization
