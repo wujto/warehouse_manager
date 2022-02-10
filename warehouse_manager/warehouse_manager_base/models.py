@@ -12,7 +12,7 @@ class ProductSetModel(models.Model):
     class Meta:
         ordering = ['name']
         verbose_name = 'products set'
-        verbose_plural_name = 'products sets'
+        verbose_name_plural = 'products sets'
 
     def __str__(self):
         return f'{self.id_number} {self.name}'
@@ -33,7 +33,7 @@ class LocalizationModel(models.Model):
     class Meta:
         ordering = ['name']
         verbose_name = 'localization'
-        verbose_plural_name = 'categories'
+        verbose_name_plural = 'categories'
 
     def __str__(self):
         return self.name
@@ -45,7 +45,7 @@ class CategoryModel(models.Model):
     class Meta:
         ordering = ['name']
         verbose_name = 'category'
-        verbose_plural_name = 'categories'
+        verbose_name_plural = 'categories'
 
     def __str__(self):
         return self.name
@@ -63,7 +63,7 @@ class ProductModel(models.Model):
     class Meta:
         ordering = ['name']
         verbose_name = 'product'
-        verbose_plural_name = 'products'
+        verbose_name_plural = 'products'
 
     def __str__(self):
         return f'{self.id_number} {self.name}'
@@ -140,7 +140,7 @@ class CustomUserModel(AbstractBaseUser, PermissionsMixin):
     class Meta:
         ordering = ['first_name']
         verbose_name = 'user'
-        verbose_plural_name = 'users'
+        verbose_name_plural = 'users'
 
     def __str__(self):
         return f'{self.first_name} {self.last_name} | {self.email}'
@@ -151,12 +151,12 @@ class ConfirmationOfTransfer(models.Model):
     ('REJECTED','Rejected'))#Product can`t be assigned to new owner and confirmation can be destroyed
 
     product = models.ForeignKey(ProductModel,on_delete= models.DO_NOTHING, related_name='confirmations')
-    owner = models.ForeignKey(CustomUserModel, on_delete= models.DO_NOTHING, related_name='confirmations')
-    recipient = models.ForeignKey(CustomUserModel, on_delete= models.DO_NOTHING, related_name='confirmations')
+    owner = models.ForeignKey(CustomUserModel, on_delete= models.DO_NOTHING, related_name='owned_confirmations')
+    recipient = models.ForeignKey(CustomUserModel, on_delete= models.DO_NOTHING, related_name='recipient_confirmations')
     status = models.CharField(max_length=15, choices=CHOICES)
     date = models.DateTimeField(default= timezone.now)
 
     class Meta:
         ordering = ['-date']
         verbose_name = 'confirmation'
-        verbose_plural_name = 'confirmations'
+        verbose_name_plural = 'confirmations'
