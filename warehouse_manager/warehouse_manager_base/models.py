@@ -33,7 +33,7 @@ class LocalizationModel(models.Model):
     class Meta:
         ordering = ['name']
         verbose_name = 'localization'
-        verbose_name_plural = 'categories'
+        verbose_name_plural = 'localizations'
 
     def __str__(self):
         return self.name
