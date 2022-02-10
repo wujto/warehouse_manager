@@ -22,6 +22,9 @@ class ProductSetModel(models.Model):
         return info
 
     def edit_name(self, name):
+        if len(name) == 0:
+            raise ValueError("Name must be longer!!!")
+
         try:
             self.name = name
         except:
@@ -42,8 +45,8 @@ class LocalizationModel(models.Model):
         return self.description
 
     def edit_name(self, name):
-        # if len(name) == 0:
-        #     raise Exception("Localization name must be longer!!")
+        if len(name) == 0:
+            raise ValueError("Localization name must be longer!!")
 
         try:
             self.name = name
@@ -68,6 +71,9 @@ class CategoryModel(models.Model):
         self.description = description
 
     def edit_name(self, name):
+        if len(name) == 0:
+            raise ValueError("Name must be longer")
+
         try:
             self.name = name
         except:
@@ -80,7 +86,7 @@ class ProductModel(models.Model):
     description = models.CharField(max_length=100, default="")
     category = models.ForeignKey(CategoryModel, on_delete= models.DO_NOTHING, blank=False, null=False)
     localization = models.ForeignKey(LocalizationModel, on_delete = models.DO_NOTHING, blank=False, null=False)
-    photo = models.FileField()
+    photo = models.FileField(upload_to="products/")
     product_set = models.ForeignKey(ProductSetModel,on_delete = models.DO_NOTHING, null=True, blank=False)
     product_user = models.ForeignKey("CustomUserModel",on_delete = models.DO_NOTHING, blank=False, null=True)
 
@@ -201,10 +207,6 @@ class CustomUserModel(AbstractBaseUser, PermissionsMixin):
             return self.localization
         
         return "That user have not set localization yet"
-
-    def get_products(self):
-        products = self.productmodel_set.all()
-        return products
 
     def set_phone_number(self, number):
         if len(number) < 9:
