@@ -29,25 +29,15 @@ class UserManagerTests(TestCase):
 
 class LocalizationTest(TestCase):
     def test_creation_model(self):
-        l1 = LocalizationModel(name= "DSK", description= "description")
-
-        with self.assertRaises(ValueError):
-            l1.edit_name("")
-        self.assertTrue(l1.edit_name("Name"))
+        LocalizationModel(name= "DSK", description= "description")
 
 class CategoryTest(TestCase):
     def test_creation_category(self):
-        c1 = CategoryModel("Name","")
-
-        with self.assertRaises(ValueError):
-            c1.edit_name("")
+        CategoryModel("Name","")
 
 class ProductSetTest(TestCase):
     def test_create_model(self):
-        ps = ProductSetModel("123", "Name","description")
-
-        with self.assertRaises(ValueError):
-            ps.edit_name("")
+        ProductSetModel("123", "Name","description")
 
 class ProductTest(TestCase):
     def test_create_model(self):
@@ -56,30 +46,4 @@ class ProductTest(TestCase):
         l = LocalizationModel("DSK")
         c = CategoryModel("Tables")
         ps = ProductSetModel("123","set name", 'set description')
-        p = ProductModel("123", "Product", "description",c,l,ps,u)
-        info = {'name': "Name",
-        'description': "desc",
-        'category': None,
-        'localization': None}
-
-        p.edit_info(info)
-    
-    def test_edit_user(self):
-        User = get_user_model()
-        u = User.objects.create_user(email="utest@test.pl",password = 'testpassword', first_name='Test', last_name = 'Test', phone_number = '123456789')
-        l = LocalizationModel("DSK")
-        c = CategoryModel("Tables")
-        ps = ProductSetModel("123","set name", 'set description')
-        p = ProductModel(id_number="123",name= "Product",description= "description",category= c,localization= l,product_set= ps)
-
-        p.set_product_user(u)
-
-    def test_edit_productset(self):
-        User = get_user_model()
-        u = User.objects.create_user(email="utest@test.pl",password = 'testpassword', first_name='Test', last_name = 'Test', phone_number = '123456789')
-        l = LocalizationModel("DSK")
-        c = CategoryModel("Tables")
-        ps = ProductSetModel("123","set name", 'set description')
-        p = ProductModel(id_number="123",name= "Product",description= "description",category= c,localization= l,product_user= u)
-
-        p.set_product_set(ps)
+        ProductModel("123", "Product", "description",c,l,ps,u)

@@ -1,3 +1,8 @@
 from django.contrib import admin
+from .models import LocalizationModel,CustomUserModel,CategoryModel,ProductModel,ProductSetModel
 
-# Register your models here.
+admin.site.register(LocalizationModel)
+admin.site.register(CustomUserModel)
+admin.site.register(CategoryModel)
+admin.site.register(ProductModel)
+admin.site.register(ProductSetModel)

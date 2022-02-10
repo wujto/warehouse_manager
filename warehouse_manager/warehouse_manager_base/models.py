@@ -9,6 +9,11 @@ class ProductSetModel(models.Model):
     description = models.CharField(max_length=100, default="")
     products_count = models.SmallIntegerField(default=0)
 
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'products set'
+        verbose_plural_name = 'products sets'
+
     def __str__(self):
         return f'{self.id_number} {self.name}'
 
@@ -21,74 +26,44 @@ class ProductSetModel(models.Model):
 
         return info
 
-    def edit_name(self, name):
-        if len(name) == 0:
-            raise ValueError("Name must be longer!!!")
-
-        try:
-            self.name = name
-        except:
-            return False
-        return True
-
-    def edit_description(self, description):
-        self.description = description
-
 class LocalizationModel(models.Model):
     name = models.CharField(unique=True, max_length=25, blank=False, null=False)
     description = models.CharField(max_length=50, default= "")
 
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'localization'
+        verbose_plural_name = 'categories'
+
     def __str__(self):
         return self.name
-    
-    def get_description(self):
-        return self.description
-
-    def edit_name(self, name):
-        if len(name) == 0:
-            raise ValueError("Localization name must be longer!!")
-
-        try:
-            self.name = name
-        except:
-            return False
-        return True
-
-    def edit_description(self, description):
-        self.description = description
 
 class CategoryModel(models.Model):
     name = models.CharField(unique=True, max_length=15, blank=False, null=False)
     description = models.CharField(max_length=100, default="")
 
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'category'
+        verbose_plural_name = 'categories'
+
     def __str__(self):
         return self.name
-
-    def get_description(self):
-        return self.description
-    
-    def edit_description(self, description):
-        self.description = description
-
-    def edit_name(self, name):
-        if len(name) == 0:
-            raise ValueError("Name must be longer")
-
-        try:
-            self.name = name
-        except:
-            return False
-        return True
 
 class ProductModel(models.Model):
     id_number = models.CharField(unique=True, max_length=9) #Number to identify product in database
     name = models.CharField(max_length=25, blank=False, null=False)
     description = models.CharField(max_length=100, default="")
-    category = models.ForeignKey(CategoryModel, on_delete= models.DO_NOTHING, blank=False, null=False)
-    localization = models.ForeignKey(LocalizationModel, on_delete = models.DO_NOTHING, blank=False, null=False)
+    category = models.ForeignKey(CategoryModel, on_delete= models.DO_NOTHING, blank=False, null=False, related_name='products')
+    localization = models.ForeignKey(LocalizationModel, on_delete = models.DO_NOTHING, blank=False, null=False, related_name='products')
     photo = models.FileField(upload_to="products/")
-    product_set = models.ForeignKey(ProductSetModel,on_delete = models.DO_NOTHING, null=True, blank=False)
-    product_user = models.ForeignKey("CustomUserModel",on_delete = models.DO_NOTHING, blank=False, null=True)
+    product_set = models.ForeignKey(ProductSetModel,on_delete = models.DO_NOTHING, null=True, blank=False, related_name='products')
+    product_user = models.ForeignKey("CustomUserModel",on_delete = models.DO_NOTHING, blank=False, null=True, related_name='products')
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'product'
+        verbose_plural_name = 'products'
 
     def __str__(self):
         return f'{self.id_number} {self.name}'
@@ -106,22 +81,6 @@ class ProductModel(models.Model):
         }
 
         return info
-
-    # Edit name, description, category, localization
-    def edit_info(self, info):
-        self.name = info['name']
-        self.description = info['description']
-        self.category = info['category']
-        self.localization = info['localization']
-
-    def set_photo(self, photo):
-        self.photo = photo
-
-    def set_product_set(self, product_set):
-        self.product_set = product_set
-
-    def set_product_user(self, user):
-        self.product_user = user
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
@@ -171,88 +130,33 @@ class CustomUserModel(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=15, blank=False, null=False)
     last_name = models.CharField(max_length=20, blank=False, null=False)
     phone_number = models.CharField(max_length=9, blank=False, null=False)
-    localization = models.ForeignKey(LocalizationModel, blank=False, null=True, on_delete= models.DO_NOTHING)
+    localization = models.ForeignKey(LocalizationModel, blank=False, null=True, on_delete= models.DO_NOTHING, related_name='users')
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
 
+    class Meta:
+        ordering = ['first_name']
+        verbose_name = 'user'
+        verbose_plural_name = 'users'
+
     def __str__(self):
         return f'{self.first_name} {self.last_name} | {self.email}'
 
-    def get_email(self):
-        return self.email
+class ConfirmationOfTransfer(models.Model):
+    CHOICES = (('PENDING','Pending'),# Waiting for confirm or reject
+    ('CONFIRMED','Confirmed'),#Product can be assigned to new owner and confirmation can be destroyed
+    ('REJECTED','Rejected'))#Product can`t be assigned to new owner and confirmation can be destroyed
 
-    def get_first_name(self):
-        return self.first_name
-    
-    def get_last_name(self):
-        return self.last_name
+    product = models.ForeignKey(ProductModel,on_delete= models.DO_NOTHING, related_name='confirmations')
+    owner = models.ForeignKey(CustomUserModel, on_delete= models.DO_NOTHING, related_name='confirmations')
+    recipient = models.ForeignKey(CustomUserModel, on_delete= models.DO_NOTHING, related_name='confirmations')
+    status = models.CharField(max_length=15, choices=CHOICES)
+    date = models.DateTimeField(default= timezone.now)
 
-    def get_is_staff(self):
-        return self.is_staff
-
-    def get_is_admin(self):
-        return self.is_admin
-
-    def get_is_manager(self):
-        return self.is_manager
-
-    def get_phone_number(self):
-        return self.phone_number
-
-    def get_localization(self):
-        if self.localization:
-            return self.localization
-        
-        return "That user have not set localization yet"
-
-    def set_phone_number(self, number):
-        if len(number) < 9:
-            raise ValueError("Invalid number length, number to short")
-        elif len(number) > 9:
-            raise ValueError("Invalid number length, number to long")
-
-        self.phone_number = number
-
-        return self.phone_number
-
-    def set_first_name(self, name):
-        if len(name):
-            self.first_name = name
-        else:
-            raise ValueError("Name can not be empty!!")
-
-        return self.first_name
-
-    def set_last_name(self, last_name):
-        if len(last_name):
-            self.last_name = last_name
-        else:
-            raise ValueError("Last name can not be empty")
-
-        return self.last_name
-
-    def set_is_admin(self, admin):
-        self.is_admin = admin
-        return self.is_admin
-
-    def set_is_manager(self, manager):
-        self.is_manager = manager
-        return self.is_manager
-
-    def set_email(self, email):
-        try:
-            CustomUserModel.objects.get(email= email)
-        except:
-            raise ValueError('User with that email is already exist')
-
-        self.email = email
-
-    def set_localization(self, localization):
-        if isinstance(localization, LocalizationModel):
-            self.localization = localization
-        else:
-            raise ValueError('')
-        return self.localization
+    class Meta:
+        ordering = ['-date']
+        verbose_name = 'confirmation'
+        verbose_plural_name = 'confirmations'
