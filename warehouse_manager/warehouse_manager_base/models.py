@@ -59,7 +59,7 @@ class ProductModel(models.Model):
     description = models.CharField(max_length=100, default="")
     category = models.ForeignKey(CategoryModel, on_delete= models.DO_NOTHING, blank=False, null=False, related_name='products')
     localization = models.ForeignKey(LocalizationModel, on_delete = models.DO_NOTHING, blank=False, null=False, related_name='products')
-    photo = models.FileField(upload_to="products/")
+    photo = models.FileField(upload_to="products/",null= True, blank= False)
     product_set = models.ForeignKey(ProductSetModel,on_delete = models.DO_NOTHING, null=True, blank=False, related_name='products')
     product_user = models.ForeignKey("CustomUserModel",on_delete = models.DO_NOTHING, blank=False, null=True, related_name='products')
 
