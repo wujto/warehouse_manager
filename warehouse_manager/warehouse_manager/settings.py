@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'warehouse_manager_base',
+    'warehouse_manager_browser_app',
 ]
 
 MIDDLEWARE = [
