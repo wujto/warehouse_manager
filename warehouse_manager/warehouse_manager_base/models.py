@@ -11,6 +11,7 @@ class ProductSetModel(models.Model):
 
     class Meta:
         ordering = ['name']
+        permissions = [('is_manager','Can create, edit and delete')]
         verbose_name = 'products set'
         verbose_name_plural = 'products sets'
 
@@ -32,6 +33,7 @@ class LocalizationModel(models.Model):
 
     class Meta:
         ordering = ['name']
+        permissions = [('is_manager','Can create, edit and delete')]
         verbose_name = 'localization'
         verbose_name_plural = 'localizations'
 
@@ -44,6 +46,7 @@ class CategoryModel(models.Model):
 
     class Meta:
         ordering = ['name']
+        permissions = [('is_manager','Can create, edit and delete')]
         verbose_name = 'category'
         verbose_name_plural = 'categories'
 
@@ -62,6 +65,7 @@ class ProductModel(models.Model):
 
     class Meta:
         ordering = ['name']
+        permissions = [('is_manager','Can create, edit and delete')]
         verbose_name = 'product'
         verbose_name_plural = 'products'
 
@@ -139,6 +143,7 @@ class CustomUserModel(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         ordering = ['first_name']
+        permissions = [('is_admin','Can create and delete')]
         verbose_name = 'user'
         verbose_name_plural = 'users'
 
@@ -158,5 +163,7 @@ class ConfirmationOfTransfer(models.Model):
 
     class Meta:
         ordering = ['-date']
+        permissions = [('is_owner','Can create and delete'),
+        ('is_recipient','Can edit status and delete')]
         verbose_name = 'confirmation'
         verbose_name_plural = 'confirmations'
