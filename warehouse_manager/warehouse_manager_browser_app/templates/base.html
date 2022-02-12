@@ -1,0 +1,23 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block 'title' %} Base {% endblock %}</title>
+    {% block 'head' %} {% endblock %}
+</head>
+<body>
+    <div id='body_header'>{% block 'body_header' %} Warehouse Manager {% endblock %}</div>
+
+    <div id='content'>
+        {% block 'content' %}{% endblock %}
+    </div>
+
+    <div id='right_panel'>{% block 'right_panel' %} Right panel {% endblock %}</div>
+
+    
+</body>
+</html>
