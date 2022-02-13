@@ -28,14 +28,20 @@ class ProductSetModel(models.Model):
 
         return info
     
-    def get_absolute_url(self):
-        return reverse('product_set_detail', args =[str(self.pk)])
-
-    def get_edit_url(self):
-        return reverse('product_set_edit', args=[str(self.pk)])
-    
     def get_create_url(self):
         return reverse('product_set_create')
+
+    def get_absolute_url(self):
+        return reverse('product_set_detail', args = [str(self.pk)])
+
+    def get_edit_url(self):
+        return reverse('prouct_set_update', args = [str(self.pk)])
+
+    def get_delete_url(self):
+        return reverse('product_set_delete', args = [str(self.pk)])
+
+    def get_list_url(self):
+        return reverse('product_set_list')
 
 class LocalizationModel(models.Model):
     name = models.CharField(unique=True, max_length=25, blank=False, null=False)
@@ -52,6 +58,18 @@ class LocalizationModel(models.Model):
 
     def get_absolute_url(self):
         return reverse('localization_detail', args =[str(self.pk)])
+    
+    def get_edit_url(self):
+        return reverse('localization_update', args =[str(self.pk)])
+
+    def get_delete_url(self):
+        return reverse('localization_delete', args = [str(self.pk)])
+
+    def get_create_url(self):
+        return reverse('localization_create')
+
+    def get_list_url(self):
+        return reverse('localization_list')
 
 class CategoryModel(models.Model):
     name = models.CharField(unique=True, max_length=15, blank=False, null=False)
@@ -68,6 +86,18 @@ class CategoryModel(models.Model):
     
     def get_absolute_url(self):
         return reverse('category_detail', args =[str(self.pk)])
+
+    def get_edit_url(self):
+        return reverse('category_update', args = [str(self.pk)])
+
+    def get_delete_url(self):
+        return reverse('category_delete', args = [str(self.pk)])
+    
+    def get_create_url(self):
+        return reverse('category_create')
+
+    def get_list_url(self):
+        return reverse('category_list')
 
 class ProductModel(models.Model):
     id_number = models.CharField(unique=True, max_length=9) #Number to identify product in database
@@ -114,6 +144,9 @@ class ProductModel(models.Model):
     def get_create_url(self):
         return reverse('product_create')
 
+    def get_list_url(self):
+        return reverse('product_list')
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
         if not email:
@@ -128,7 +161,7 @@ class CustomUserManager(BaseUserManager):
                 raise ValueError("last_name can not be empty")
         except:
             pass
-
+        
         email = self.normalize_email(email)
         user = self.model(email = email, **extra_fields)
         user.set_password(password)
@@ -180,6 +213,18 @@ class CustomUserModel(AbstractBaseUser, PermissionsMixin):
 
     def get_absolute_url(self):
         return reverse('user_detail', args =[str(self.pk)])
+    
+    def get_create_url(self):
+        return reverse('user_create')
+
+    def get_edit_url(self):
+        return reverse('user_update', args = [str(self.pk)])
+
+    def get_delete_url(self):
+        return reverse('user_delete', args = [str(self.pk)])
+
+    def get_list_url(self):
+        return reverse('user_list')
 
 class ConfirmationOfTransfer(models.Model):
     CHOICES = (('PENDING','Pending'),# Waiting for confirm or reject
@@ -204,3 +249,15 @@ class ConfirmationOfTransfer(models.Model):
 
     def get_absolute_url(self):
         return reverse('confirmation_detail', args =[str(self.pk)])
+    
+    def get_create_url(self):
+        return reverse('confirmation_create')
+
+    def get_edit_url(self):
+        return reverse('confirmation_update', args = [str(self.pk)])
+
+    def get_delete_url(self):
+        return reverse('confirmation_delete', args = [str(self.pk)])
+
+    def get_list_url(self):
+        return reverse('confirmation_list')

@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.urls import reverse_lazy
+from django.shortcuts import render, redirect
+from django.urls import reverse, reverse_lazy
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -134,16 +134,23 @@ class UserCreateView(CreateView):
     fields = ['email', 'password', 'first_name', 'last_name', 'phone_number']
     template_name = 'create.html'
 
+    def post(self, request, *args, **kwargs):
+        data = {'first_name':request.POST['first_name'],
+        'last_name': request.POST['last_name'],
+        'phone_number': request.POST['phone_number']}
+        u = self.model.objects.create_user(request.POST['email'],request.POST['password'], **data)
+        return redirect(reverse_lazy('user_detail', args = [str(u.pk)]))
+
 class UserDetailView(DetailView):
     model = CustomUserModel
     template_name = 'detail.html'
 
 class UserUpdateView(UpdateView):
     model = CustomUserModel
-    fields = ['password', 'first_name', 'last_name', 'phone_number', 'is_admin', 'is_manager', 'permissions']
+    fields = ['password', 'first_name', 'last_name', 'phone_number', 'is_admin', 'is_manager', 'user_permissions']
     template_name = 'update.html'
 
 class UserDeleteView(DeleteView):
     model = CustomUserModel
-    success_url = 'user_list'
+    success_url = reverse_lazy('user_list')
     template_name = 'delete.html'
