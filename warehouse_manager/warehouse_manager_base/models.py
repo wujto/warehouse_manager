@@ -189,7 +189,7 @@ class ConfirmationOfTransfer(models.Model):
     product = models.ForeignKey(ProductModel,on_delete= models.DO_NOTHING, related_name='confirmations')
     owner = models.ForeignKey(CustomUserModel, on_delete= models.DO_NOTHING, related_name='owned_confirmations')
     recipient = models.ForeignKey(CustomUserModel, on_delete= models.DO_NOTHING, related_name='recipient_confirmations')
-    status = models.CharField(max_length=15, choices=CHOICES)
+    status = models.CharField(max_length=15, choices=CHOICES, default=CHOICES[0])
     date = models.DateTimeField(default= timezone.now)
 
     class Meta:
