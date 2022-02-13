@@ -31,6 +31,12 @@ class ProductSetModel(models.Model):
     def get_absolute_url(self):
         return reverse('product_set_detail', args =[str(self.pk)])
 
+    def get_edit_url(self):
+        return reverse('product_set_edit', args=[str(self.pk)])
+    
+    def get_create_url(self):
+        return reverse('product_set_create')
+
 class LocalizationModel(models.Model):
     name = models.CharField(unique=True, max_length=25, blank=False, null=False)
     description = models.CharField(max_length=50, default= "")
@@ -70,8 +76,8 @@ class ProductModel(models.Model):
     category = models.ForeignKey(CategoryModel, on_delete= models.DO_NOTHING, blank=False, null=False, related_name='products')
     localization = models.ForeignKey(LocalizationModel, on_delete = models.DO_NOTHING, blank=False, null=False, related_name='products')
     photo = models.FileField(upload_to="products/",null= True, blank= True, default= None)
-    product_set = models.ForeignKey(ProductSetModel,on_delete = models.DO_NOTHING, null=True, blank=False, related_name='products')
-    product_user = models.ForeignKey("CustomUserModel",on_delete = models.DO_NOTHING, blank=False, null=True, related_name='products')
+    product_set = models.ForeignKey(ProductSetModel,on_delete = models.DO_NOTHING, null=True, blank=True, related_name='products')
+    product_user = models.ForeignKey("CustomUserModel",on_delete = models.DO_NOTHING, blank=True, null=True, related_name='products')
 
     class Meta:
         ordering = ['name']
@@ -98,6 +104,15 @@ class ProductModel(models.Model):
 
     def get_absolute_url(self):
         return reverse('product_detail', args =[str(self.pk)])
+
+    def get_edit_url(self):
+        return reverse('product_update', args=[str(self.pk)])
+
+    def get_delete_url(self):
+        return reverse('product_delete', args=[str(self.pk)])
+
+    def get_create_url(self):
+        return reverse('product_create')
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):

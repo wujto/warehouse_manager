@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+
+{% block 'content' %}
+    <a href= "{{ product.get_create_url }}" class='link-btn'>New product</a>
+    <ul>
+        {% for product in object_list %}
+            <a href = "{{ product.get_absolute_url }}"><li>{{ product }}</li></a><a href= "{{ product.get_delete_url }}">X</a>
+        {% empty %}
+            <li>No products yet.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
