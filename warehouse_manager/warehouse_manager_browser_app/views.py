@@ -15,7 +15,7 @@ class ProductListView(ListView):
 
 class ProductCreateView(CreateView):
     model = ProductModel
-    fields = ['id_number', 'name', 'description', 'category','localization']
+    fields = ['id_number', 'name', 'description', 'category','localization', 'photo']
     template_name = 'create.html'
 
     def get_context_data(self, **kwargs):

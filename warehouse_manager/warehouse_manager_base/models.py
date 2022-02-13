@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.urls import reverse
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
@@ -26,6 +27,9 @@ class ProductSetModel(models.Model):
         }
 
         return info
+    
+    def get_absolute_url(self):
+        return reverse('product_set_detail', args =[str(self.pk)])
 
 class LocalizationModel(models.Model):
     name = models.CharField(unique=True, max_length=25, blank=False, null=False)
@@ -40,6 +44,9 @@ class LocalizationModel(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse('localization_detail', args =[str(self.pk)])
+
 class CategoryModel(models.Model):
     name = models.CharField(unique=True, max_length=15, blank=False, null=False)
     description = models.CharField(max_length=100, default="")
@@ -52,6 +59,9 @@ class CategoryModel(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def get_absolute_url(self):
+        return reverse('category_detail', args =[str(self.pk)])
 
 class ProductModel(models.Model):
     id_number = models.CharField(unique=True, max_length=9) #Number to identify product in database
@@ -59,7 +69,7 @@ class ProductModel(models.Model):
     description = models.CharField(max_length=100, default="")
     category = models.ForeignKey(CategoryModel, on_delete= models.DO_NOTHING, blank=False, null=False, related_name='products')
     localization = models.ForeignKey(LocalizationModel, on_delete = models.DO_NOTHING, blank=False, null=False, related_name='products')
-    photo = models.FileField(upload_to="products/",null= True, blank= False)
+    photo = models.FileField(upload_to="products/",null= True, blank= True, default= None)
     product_set = models.ForeignKey(ProductSetModel,on_delete = models.DO_NOTHING, null=True, blank=False, related_name='products')
     product_user = models.ForeignKey("CustomUserModel",on_delete = models.DO_NOTHING, blank=False, null=True, related_name='products')
 
@@ -85,6 +95,9 @@ class ProductModel(models.Model):
         }
 
         return info
+
+    def get_absolute_url(self):
+        return reverse('product_detail', args =[str(self.pk)])
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
@@ -150,6 +163,9 @@ class CustomUserModel(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f'{self.first_name} {self.last_name} | {self.email}'
 
+    def get_absolute_url(self):
+        return reverse('user_detail', args =[str(self.pk)])
+
 class ConfirmationOfTransfer(models.Model):
     CHOICES = (('PENDING','Pending'),# Waiting for confirm or reject
     ('CONFIRMED','Confirmed'),#Product can be assigned to new owner and confirmation can be destroyed
@@ -167,3 +183,9 @@ class ConfirmationOfTransfer(models.Model):
         ('is_recipient','Can edit status and delete')]
         verbose_name = 'confirmation'
         verbose_name_plural = 'confirmations'
+
+    def __str__(self):
+        return f'{self.product} to {self.recipient}'
+
+    def get_absolute_url(self):
+        return reverse('confirmation_detail', args =[str(self.pk)])
