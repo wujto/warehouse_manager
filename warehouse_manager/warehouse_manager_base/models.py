@@ -43,6 +43,9 @@ class ProductSetModel(models.Model):
     def get_list_url(self):
         return reverse('product_set_list')
 
+    def get_model_name(self):
+        return 'ProductSetModel'
+
 class LocalizationModel(models.Model):
     name = models.CharField(unique=True, max_length=25, blank=False, null=False)
     description = models.CharField(max_length=50, default= "")
@@ -71,6 +74,9 @@ class LocalizationModel(models.Model):
     def get_list_url(self):
         return reverse('localization_list')
 
+    def get_model_name(self):
+        return 'LocalizationModel'
+
 class CategoryModel(models.Model):
     name = models.CharField(unique=True, max_length=15, blank=False, null=False)
     description = models.CharField(max_length=100, default="")
@@ -98,6 +104,9 @@ class CategoryModel(models.Model):
 
     def get_list_url(self):
         return reverse('category_list')
+
+    def get_model_name(self):
+        return 'CategoryModel'
 
 class ProductModel(models.Model):
     id_number = models.CharField(unique=True, max_length=9) #Number to identify product in database
@@ -146,6 +155,9 @@ class ProductModel(models.Model):
 
     def get_list_url(self):
         return reverse('product_list')
+
+    def get_model_name(self):
+        return 'ProductModel'
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
@@ -226,6 +238,9 @@ class CustomUserModel(AbstractBaseUser, PermissionsMixin):
     def get_list_url(self):
         return reverse('user_list')
 
+    def get_model_name(self):
+        return 'CustomUserModel'
+
 class ConfirmationOfTransfer(models.Model):
     CHOICES = (('PENDING','Pending'),# Waiting for confirm or reject
     ('CONFIRMED','Confirmed'),#Product can be assigned to new owner and confirmation can be destroyed
@@ -261,3 +276,6 @@ class ConfirmationOfTransfer(models.Model):
 
     def get_list_url(self):
         return reverse('confirmation_list')
+
+    def get_model_name(self):
+        return 'ConfirmationOfTransfer'

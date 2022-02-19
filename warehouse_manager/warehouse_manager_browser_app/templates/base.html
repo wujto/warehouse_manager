@@ -6,17 +6,26 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block 'title' %} Base {% endblock %}</title>
+    <title>{% block 'title' %} {{request.user.first_name }} {% endblock %}</title>
     {% block 'head' %} {% endblock %}
 </head>
 <body>
     <div id='body_header'>{% block 'body_header' %} Warehouse Manager {% endblock %}</div>
+    <div id='nav'>
+        <ul>
+            <a><li>Wyloguj</li></a>
+            <a href = "{% url 'profile' %}"><li>Profil</li></a>
+            <a href = "{% url 'product_list' %}"><li>Produkty</li></a>
+            <a href = "{% url 'user_list' %}"><li>Urzytkownicy</li></a>
+            <a href = "{{ request.user.get_edit_url }}"><li>Ustawienia</li></a>
+        </ul>
+    </div>
 
     <div id='content'>
         {% block 'content' %}{% endblock %}
     </div>
 
-    <div id='right_panel'>{% block 'right_panel' %} Right panel {% endblock %}</div>
+    <div id='right_panel'>{% block 'right_panel' %}{% endblock %}</div>
 
     
 </body>

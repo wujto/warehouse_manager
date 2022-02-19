@@ -5,6 +5,7 @@ from .views import LocalizationCreateView, LocalizationListView, LocalizationUpd
 from .views import ProductSetListView, ProductSetCreateView, ProductSetDetailView, ProductSetUpdateView, ProductSetDeleteView
 from .views import ConfirmationListView, ConfirmationCreateView, ConfirmationDetailView, ConfirmationUpdateView, ConfirmationDeleteView
 from .views import UserListView, UserCreateView, UserDetailView, UserUpdateView, UserDeleteView
+from .views import ProfileView
 
 urlpatterns = [
 # Product
@@ -43,4 +44,6 @@ urlpatterns = [
     path('user/detail/<slug:pk>', UserDetailView.as_view(), name = 'user_detail'),
     path('user/update/<slug:pk>', UserUpdateView.as_view(), name = 'user_update'),
     path('user/delete/<slug:pk>', UserDeleteView.as_view(), name = 'user_delete'),
+# Profile
+    path('profile', ProfileView.as_view(), name = 'profile')
 ]

@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
+from django.views.generic import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -22,7 +23,7 @@ class ProductCreateView(CreateView):
 
 class ProductDetailView(DetailView):
     model = ProductModel
-    template_name = 'detail.html'
+    template_name = 'product_detail.html'
 
 class ProductUpdateView(UpdateView):
     model = ProductModel
@@ -45,7 +46,7 @@ class CategoryCreateView(CreateView):
 
 class CategoryDetailView(DetailView):
     model = CategoryModel
-    template_name = 'detail.html'
+    template_name = 'category_localization_detail.html'
 
 class CategoryUpdateView(UpdateView):
     model = CategoryModel
@@ -54,7 +55,7 @@ class CategoryUpdateView(UpdateView):
 
 class CategoryDeleteView(DeleteView):
     model = CategoryModel
-    success_url = 'category_list'
+    success_url = reverse_lazy('category_list')
     template_name = 'delete.html'
 
 class LocalizationCreateView(CreateView):
@@ -68,7 +69,7 @@ class LocalizationListView(ListView):
 
 class LocalizationDetailView(DetailView):
     model = LocalizationModel
-    template_name = 'detail.html'
+    template_name = 'category_localization_detail.html'
 
 class LocalizationUpdateView(UpdateView):
     model = LocalizationModel
@@ -77,7 +78,7 @@ class LocalizationUpdateView(UpdateView):
 class LocalizationDeleteView(DeleteView):
     model = LocalizationModel
     template_name = 'delete.html'
-    success_url = 'localization_list'
+    success_url = reverse_lazy('localization_list')
 
 class ProductSetListView(ListView):
     model = ProductSetModel
@@ -90,7 +91,7 @@ class ProductSetCreateView(CreateView):
 
 class ProductSetDetailView(DetailView):
     model = ProductSetModel
-    template_name = 'detail.html'
+    template_name = 'productset_detail.html'
 
 class ProductSetUpdateView(UpdateView):
     model = ProductSetModel
@@ -100,7 +101,7 @@ class ProductSetUpdateView(UpdateView):
 class ProductSetDeleteView(DeleteView):
     model = ProductSetModel
     template_name = 'delete.html'
-    success_url = 'product_set_list'
+    success_url = reverse_lazy('product_set_list')
 
 class ConfirmationListView(ListView):
     model = ConfirmationOfTransfer
@@ -113,7 +114,7 @@ class ConfirmationCreateView(CreateView):
 
 class ConfirmationDetailView(DetailView):
     model = ConfirmationOfTransfer
-    template_name = 'detail.html'
+    template_name = 'confirmation_detail.html'
 
 class ConfirmationUpdateView(UpdateView):
     model = ConfirmationOfTransfer
@@ -123,7 +124,7 @@ class ConfirmationUpdateView(UpdateView):
 class ConfirmationDeleteView(DeleteView):
     model = ConfirmationOfTransfer
     template_name = 'delete.html'
-    success_url = '' # do profilu urzytkownika
+    success_url = reverse_lazy('confirmation_list')
 
 class UserListView(ListView):
     model = CustomUserModel
@@ -143,14 +144,30 @@ class UserCreateView(CreateView):
 
 class UserDetailView(DetailView):
     model = CustomUserModel
-    template_name = 'detail.html'
+    template_name = 'user_detail.html'
 
 class UserUpdateView(UpdateView):
     model = CustomUserModel
     fields = ['password', 'first_name', 'last_name', 'phone_number', 'is_admin', 'is_manager', 'user_permissions']
     template_name = 'update.html'
 
+    def post(self, request, *args, **kwargs):
+        u =self.get_object()
+        u.first_name = request.POST['first_name']
+        u.last_name = request.POST['last_name']
+        u.phone_number = request.POST['phone_number']
+        u.set_password(request.POST['password'])
+        u.save()
+        return redirect(reverse_lazy('user_detail', args = [str(u.pk)]))
+
 class UserDeleteView(DeleteView):
     model = CustomUserModel
     success_url = reverse_lazy('user_list')
     template_name = 'delete.html'
+
+class ProfileView(TemplateView):
+    template_name = 'base.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
