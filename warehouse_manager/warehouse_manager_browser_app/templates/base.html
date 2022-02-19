@@ -20,6 +20,7 @@
             <a href = "{{ request.user.get_edit_url }}"><li>Ustawienia</li></a>
         </ul>
     </div>
+    {{request.user.is_manager}}
 
     <div id='content'>
         {% block 'content' %}{% endblock %}
