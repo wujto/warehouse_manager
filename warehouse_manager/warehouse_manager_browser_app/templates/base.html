@@ -13,17 +13,50 @@
     <div id='body_header'>{% block 'body_header' %} Warehouse Manager {% endblock %}</div>
     <div id='nav'>
         <ul>
-            <a><li>Wyloguj</li></a>
-            <a href = "{% url 'profile' %}"><li>Profil</li></a>
-            <a href = "{% url 'product_list' %}"><li>Produkty</li></a>
-            <a href = "{% url 'user_list' %}"><li>Urzytkownicy</li></a>
-            <a href = "{{ request.user.get_edit_url }}"><li>Ustawienia</li></a>
+            {% if not user.is_authenticated %}
+                <a><li>Zaloguj</li></a>
+            {% else %}
+                <a><li>Wyloguj</li></a>
+                <a href = "{% url 'profile' %}"><li>Profil</li></a>
+                <a href = "{% url 'product_list' %}"><li>Produkty</li></a>
+                <a href = "{% url 'user_list' %}"><li>Urzytkownicy</li></a>
+                {% if user.is_manager %}
+                    <a href = "{% url 'localization_list' %}"><li>Localization</li></a>
+                    <a href = "{% url 'category_list' %}"><li>Category</li></a>
+                {% endif %}
+                <a href = "{{ user.get_edit_url }}"><li>Ustawienia</li></a>
+            {% endif %}
         </ul>
+
+        {% block 'content' %}
+        <b>
+        {% if user.is_authenticated %}  
+            {{user.first_name}} {{user.last_name}} 
+            ({% if user.is_admin%} 
+                Administrator
+            {% elif user.is_manager %}
+                Kierownik 
+            {% else %}
+                Pracownik
+            {% endif %})
+        {% else %}
+            Nie zalogowany urzytkownik
+        {% endif%}
+        </b>
     </div>
-    {{request.user.is_manager}}
 
     <div id='content'>
-        {% block 'content' %}{% endblock %}
+        <ul>
+            {% for product in user.products.values %}
+            <a href = "{% url 'product_detail' product.id %}"><li>
+                {{product.name}}<br>
+                {{product.description}}<br>
+            </li></a>
+            <a href = "">Przenieś</a>
+            {% endfor %}
+
+            {% endblock %}
+        </ul>
     </div>
 
     <div id='right_panel'>{% block 'right_panel' %}{% endblock %}</div>
