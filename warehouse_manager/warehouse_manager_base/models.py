@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.urls import reverse
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
@@ -26,6 +27,24 @@ class ProductSetModel(models.Model):
         }
 
         return info
+    
+    def get_create_url(self):
+        return reverse('product_set_create')
+
+    def get_absolute_url(self):
+        return reverse('product_set_detail', args = [str(self.pk)])
+
+    def get_edit_url(self):
+        return reverse('prouct_set_update', args = [str(self.pk)])
+
+    def get_delete_url(self):
+        return reverse('product_set_delete', args = [str(self.pk)])
+
+    def get_list_url(self):
+        return reverse('product_set_list')
+
+    def get_model_name(self):
+        return 'ProductSetModel'
 
 class LocalizationModel(models.Model):
     name = models.CharField(unique=True, max_length=25, blank=False, null=False)
@@ -40,6 +59,24 @@ class LocalizationModel(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse('localization_detail', args =[str(self.pk)])
+    
+    def get_edit_url(self):
+        return reverse('localization_update', args =[str(self.pk)])
+
+    def get_delete_url(self):
+        return reverse('localization_delete', args = [str(self.pk)])
+
+    def get_create_url(self):
+        return reverse('localization_create')
+
+    def get_list_url(self):
+        return reverse('localization_list')
+
+    def get_model_name(self):
+        return 'LocalizationModel'
+
 class CategoryModel(models.Model):
     name = models.CharField(unique=True, max_length=15, blank=False, null=False)
     description = models.CharField(max_length=100, default="")
@@ -52,6 +89,24 @@ class CategoryModel(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def get_absolute_url(self):
+        return reverse('category_detail', args =[str(self.pk)])
+
+    def get_edit_url(self):
+        return reverse('category_update', args = [str(self.pk)])
+
+    def get_delete_url(self):
+        return reverse('category_delete', args = [str(self.pk)])
+    
+    def get_create_url(self):
+        return reverse('category_create')
+
+    def get_list_url(self):
+        return reverse('category_list')
+
+    def get_model_name(self):
+        return 'CategoryModel'
 
 class ProductModel(models.Model):
     id_number = models.CharField(unique=True, max_length=9) #Number to identify product in database
@@ -59,9 +114,9 @@ class ProductModel(models.Model):
     description = models.CharField(max_length=100, default="")
     category = models.ForeignKey(CategoryModel, on_delete= models.DO_NOTHING, blank=False, null=False, related_name='products')
     localization = models.ForeignKey(LocalizationModel, on_delete = models.DO_NOTHING, blank=False, null=False, related_name='products')
-    photo = models.FileField(upload_to="products/")
-    product_set = models.ForeignKey(ProductSetModel,on_delete = models.DO_NOTHING, null=True, blank=False, related_name='products')
-    product_user = models.ForeignKey("CustomUserModel",on_delete = models.DO_NOTHING, blank=False, null=True, related_name='products')
+    photo = models.FileField(upload_to="products/",null= True, blank= True, default= None)
+    product_set = models.ForeignKey(ProductSetModel,on_delete = models.DO_NOTHING, null=True, blank=True, related_name='products')
+    product_user = models.ForeignKey("CustomUserModel",on_delete = models.DO_NOTHING, blank=True, null=True, related_name='products')
 
     class Meta:
         ordering = ['name']
@@ -86,6 +141,24 @@ class ProductModel(models.Model):
 
         return info
 
+    def get_absolute_url(self):
+        return reverse('product_detail', args =[str(self.pk)])
+
+    def get_edit_url(self):
+        return reverse('product_update', args=[str(self.pk)])
+
+    def get_delete_url(self):
+        return reverse('product_delete', args=[str(self.pk)])
+
+    def get_create_url(self):
+        return reverse('product_create')
+
+    def get_list_url(self):
+        return reverse('product_list')
+
+    def get_model_name(self):
+        return 'ProductModel'
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
         if not email:
@@ -100,7 +173,7 @@ class CustomUserManager(BaseUserManager):
                 raise ValueError("last_name can not be empty")
         except:
             pass
-
+        
         email = self.normalize_email(email)
         user = self.model(email = email, **extra_fields)
         user.set_password(password)
@@ -150,6 +223,24 @@ class CustomUserModel(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f'{self.first_name} {self.last_name} | {self.email}'
 
+    def get_absolute_url(self):
+        return reverse('user_detail', args =[str(self.pk)])
+    
+    def get_create_url(self):
+        return reverse('user_create')
+
+    def get_edit_url(self):
+        return reverse('user_update', args = [str(self.pk)])
+
+    def get_delete_url(self):
+        return reverse('user_delete', args = [str(self.pk)])
+
+    def get_list_url(self):
+        return reverse('user_list')
+
+    def get_model_name(self):
+        return 'CustomUserModel'
+
 class ConfirmationOfTransfer(models.Model):
     CHOICES = (('PENDING','Pending'),# Waiting for confirm or reject
     ('CONFIRMED','Confirmed'),#Product can be assigned to new owner and confirmation can be destroyed
@@ -158,7 +249,7 @@ class ConfirmationOfTransfer(models.Model):
     product = models.ForeignKey(ProductModel,on_delete= models.DO_NOTHING, related_name='confirmations')
     owner = models.ForeignKey(CustomUserModel, on_delete= models.DO_NOTHING, related_name='owned_confirmations')
     recipient = models.ForeignKey(CustomUserModel, on_delete= models.DO_NOTHING, related_name='recipient_confirmations')
-    status = models.CharField(max_length=15, choices=CHOICES)
+    status = models.CharField(max_length=15, choices=CHOICES, default=CHOICES[0])
     date = models.DateTimeField(default= timezone.now)
 
     class Meta:
@@ -167,3 +258,24 @@ class ConfirmationOfTransfer(models.Model):
         ('is_recipient','Can edit status and delete')]
         verbose_name = 'confirmation'
         verbose_name_plural = 'confirmations'
+
+    def __str__(self):
+        return f'{self.product} to {self.recipient}'
+
+    def get_absolute_url(self):
+        return reverse('confirmation_detail', args =[str(self.pk)])
+    
+    def get_create_url(self):
+        return reverse('confirmation_create')
+
+    def get_edit_url(self):
+        return reverse('confirmation_update', args = [str(self.pk)])
+
+    def get_delete_url(self):
+        return reverse('confirmation_delete', args = [str(self.pk)])
+
+    def get_list_url(self):
+        return reverse('confirmation_list')
+
+    def get_model_name(self):
+        return 'ConfirmationOfTransfer'

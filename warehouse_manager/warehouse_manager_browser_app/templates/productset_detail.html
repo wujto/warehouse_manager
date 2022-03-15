@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block 'title'%} {{ object.name }} {% endblock %}
+
+{% block 'content' %}
+    {% if user.is_manager == False %}
+        <a href = "{{ object.get_edit_url }}">Edit</a><br>
+    {% endif %}
+    <b>ID number:</b> {{ object.id_number }}   <b>Name:</b> {{object.name}}<br>
+    <b>Products count:</b> {{object.products_count }}<br>
+    <b>Description:</b><br> {{object.description}}<br>
+{% endblock %}

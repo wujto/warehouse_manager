@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block 'title'%} {{ object }} {% endblock %}
+
+{% block 'content' %}
+    {% if object.id == user.id %}
+        <a href = "{{ object.get_edit_url }}">Edit</a><br>
+    {% endif %}
+    <b>Email:</b> {{ object.email }}   <b>Phone number:</b> {{object.phone_number}}<br>
+    <b>First name:</b> {{object.first_name }} <b>Last name:</b> {{object.last_name }}<br>
+    <b>Localization:</b><br> {{object.localization}}<br>
+{% endblock %}

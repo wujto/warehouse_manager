@@ -1,0 +1,67 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block 'title' %} {{request.user.first_name }} {% endblock %}</title>
+    {% block 'head' %} {% endblock %}
+    <link href = "{% static 'base.css'%}" rel = "stylesheet">
+</head>
+<body>
+    <div id='body_header'>{% block 'body_header' %} Warehouse Manager {% endblock %}</div>
+    <div id='nav'>
+        <ul>
+            {% if not user.is_authenticated %}
+                <li><a>Zaloguj</a></li>
+            {% else %}
+                <li><a>Wyloguj</a></li>
+                <li><a href = "{% url 'profile' %}">Profil</a></li>
+               <li> <a href = "{% url 'product_list' %}">Produkty</a></li>
+                <li><a href = "{% url 'user_list' %}">Urzytkownicy</a></li>
+                {% if user.is_manager %}
+                   <li> <a href = "{% url 'localization_list' %}">Localization</a></li>
+                    <li><a href = "{% url 'category_list' %}">Category</a></li>
+                {% endif %}
+                <li><a href = "{{ user.get_edit_url }}">Ustawienia</a></li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <div id='content'>
+        <b id = 'name'>
+            {% if user.is_authenticated %}  
+                {{user.first_name}} {{user.last_name}} 
+                ({% if user.is_admin%} 
+                    Administrator
+                {% elif user.is_manager %}
+                    Kierownik 
+                {% else %}
+                    Pracownik
+                {% endif %})
+            {% else %}
+                Nie zalogowany urzytkownik
+            {% endif%}
+            </b>
+            
+        {% block 'content' %}
+        <ul>
+            {% for product in user.products.values %}
+            <a href = "{% url 'product_detail' product.id %}"><li>
+                {{product.name}}<br>
+                {{product.description}}<br>
+            </li></a>
+            <a href = "">Przenieś</a>
+            {% endfor %}
+
+            {% endblock %}
+        </ul>
+    </div>
+
+    <div id='right_panel'>{% block 'right_panel' %}{% endblock %}</div>
+
+    
+</body>
+</html>
