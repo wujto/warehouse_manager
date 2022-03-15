@@ -150,13 +150,19 @@ class UserUpdateView(UpdateView):
     model = CustomUserModel
     fields = ['password', 'first_name', 'last_name', 'phone_number', 'is_admin', 'is_manager', 'user_permissions']
     template_name = 'update.html'
+    
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['password'] = ''
+        return initial
 
     def post(self, request, *args, **kwargs):
         u =self.get_object()
         u.first_name = request.POST['first_name']
         u.last_name = request.POST['last_name']
         u.phone_number = request.POST['phone_number']
-        u.set_password(request.POST['password'])
+        if request.POST['password']:
+            u.set_password(request.POST['password'])
         u.save()
         return redirect(reverse_lazy('user_detail', args = [str(u.pk)]))
 

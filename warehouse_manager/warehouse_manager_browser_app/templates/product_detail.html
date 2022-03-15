@@ -3,7 +3,8 @@
 {% block 'title'%} {{ object.name }} {% endblock %}
 
 {% block 'content' %}
-    <a href = "{{ object.get_edit_url }}">Edit</a> {% if object.product_user.id == user.id %}<a href = "">Przenieś</a>{% endif %}<br>
+    {% if user.is_manager %}<a href = "{{ object.get_edit_url }}">Edit</a>{% endif %}
+    {% if object.product_user.id == user.id %}<a href = "">Przenieś</a>{% endif %}<br>
     <b>ID number:</b> {{ object.id_number }}   <b>Name:</b> {{object.name}}<br>
     <b>Category:</b> {{object.category}}   <b>Loalization:</b> {{object.localization}}<br>
     <b>User:</b> {{object.product_user}}   <b>Set name:</b> {{objct.product_set}}<br>

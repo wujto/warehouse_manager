@@ -1,0 +1,70 @@
+body{
+    background-color: rgb(95, 83, 83);
+    color: white;
+}
+#body_header{
+    display:block;
+    margin-bottom : 5px;
+    color:springgreen;
+    font-size: xx-large;
+    font-weight: bold;
+    font-family: SimSun-ExtB;
+}
+#nav ul{
+    list-style-type: none;
+    margin: 0;
+    padding:0;
+    padding:14px 16px;
+    overflow: hidden;
+    background-color: #333;
+}
+
+#nav ul li{
+    display: inline;
+}
+
+#nav ul li a{
+    display:fixed;
+    color:white;
+    text-align:center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+#nav ul a:hover{
+    background-color: springgreen;
+    color: grey;
+}
+
+#content{
+    display:grid;
+    height: 100%;
+    background-color: rgb(73, 73, 73);
+    grid-template-columns: auto, 30%;
+    grid-template-rows: 25px, auto;
+}
+
+#content ul{
+    list-style-type: none;
+    margin:0;
+    padding:10px;
+}
+
+#content a{
+    text-decoration: none;
+    color: white;
+}
+
+#content ul li{
+    display:block;
+    background-color: #333;
+    padding:10px 14px;
+}
+
+
+
+#content #name{
+    grid-column: 1;
+    grid-row: 1;
+    padding:5px;
+}
