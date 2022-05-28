@@ -13,8 +13,8 @@
     <div id='nav'>
         <ul>
             <li><a href = "{% url 'profile' %}">PROFILE</a></li>
-            <li><a href=''>USERS</a></li>
-            <li><a href=''>WAREHOUSE</a></li>
+            <li><a href='{% url "users" %}'>USERS</a></li>
+            <li><a href='{% url "warehouse" %}'>WAREHOUSE</a></li>
             <li><a href=''>SETTINGS</a></li>
             <li><a href = "{% url 'logout' %}">LOGOUT</a></li>
         </ul>

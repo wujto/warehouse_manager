@@ -1,0 +1,21 @@
+{% extends 'logged_in\base.html' %}
+
+{% block main_content %}
+
+<h2>Warehouse: {{object_list | length}}</h2>
+
+{% if object_list %}
+    <ul>
+        {% for obj in object_list %}
+            <a><li>
+                {{ obj.name}}<br>
+                {{ obj.description}}
+            </li></a>
+        {% endfor %}
+
+    </ul>
+{% else %}
+    Warehouse is empty
+{% endif%}
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'logged_in\base.html' %}
+
+{% block main_content %}
+
+<h2>Users: {{object_list | length}}</h2>
+
+{% if object_list %}
+    <ul>
+        {% for obj in object_list %}
+            <a><li>
+                {{ obj.first_name}}<br>
+                {{ obj.last_name}}
+            </li></a>
+        {% endfor %}
+
+    </ul>
+{% else %}
+    User list is empty
+{% endif%}
+
+{% endblock %}
