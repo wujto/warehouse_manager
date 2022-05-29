@@ -28,7 +28,7 @@
                 {% if user.products.all %}
                     <ul>
                         {% for tool in user.products.all %}
-                            <a><li>{{tool.name}}<br>
+                            <a href ="{{ tool.get_absolute_url}}"><li>{{tool.name}}<br>
                                 {{tool.description}}
                             </li></a>
                         {% endfor%}
@@ -44,7 +44,13 @@
 
 
 
-        <div id= 'news'></div>
+        <div id= 'news'>
+            {% block 'news_content'%}
+            
+            Treść diva news.
+            Tutaj będą prośby o przeniesienie sprzętu i może kiedyś wiadomośći
+            {% endblock %}
+        </div>
     </div>
 </body>
 </html>

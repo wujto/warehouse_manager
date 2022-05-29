@@ -7,7 +7,7 @@
 {% if object_list %}
     <ul>
         {% for obj in object_list %}
-            <a><li>
+            <a href = '{{ obj.get_absolute_url}}'><li>
                 {{ obj.name}}<br>
                 {{ obj.description}}
             </li></a>

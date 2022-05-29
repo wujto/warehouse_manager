@@ -1,3 +1,8 @@
+/* Swiss Coffee: #E1DCD9 szarawo brązowy
+Schooner: #8F868 ciemniejszy szary
+Pharlap: #A67F78 brudny róż
+Mine Shaft: #3E3C3C ciemno szary */
+
 body{
     background-color: #fff;
 }
@@ -58,5 +63,29 @@ ul{
 }
 
 #content{
+    height: fit-content;
+    margin-left: 5%;
+    margin-right:5%;
     padding: 1%;
+}
+
+#main{
+    margin:auto;
+    width: 70%;
+    float:left;
+}
+
+#main ul a li{
+    font-size: 20px;
+    border-bottom: solid red;
+    border-radius: 5%;
+    padding: 3px;
+    margin:2px;
+}
+
+#news{
+    margin: auto;
+    width:25%;
+    padding: 3px;
+    float:left;
 }
