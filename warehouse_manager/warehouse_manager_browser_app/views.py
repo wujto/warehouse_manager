@@ -9,7 +9,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from warehouse_manager_base.models import ProductModel, CategoryModel, LocalizationModel, ConfirmationOfTransfer, CustomUserModel
 
 class ProfileView(LoginRequiredMixin, TemplateView):
-    template_name = 'logged_in/base.html'
+    template_name = 'logged_in/profile.html'
 
 class UsersListView(LoginRequiredMixin, TemplateView):
     template_name = 'logged_in/users_list.html'
@@ -26,3 +26,41 @@ class WarehouseListView(LoginRequiredMixin, ListView):
 class ProductDetailsView(LoginRequiredMixin, DetailView):
     model = ProductModel
     template_name = 'logged_in/details.html'
+
+class TransferFormView(LoginRequiredMixin, CreateView):
+    model = ConfirmationOfTransfer
+    template_name = 'logged_in/transfer.html'
+    fields = ['product', 'owner','recipient']
+    success_url = '/'
+
+    def get_initial(self):
+        initial = {}
+        initial['product'] = ProductModel.objects.filter(pk = self.kwargs['pk']).first()
+        
+        if not initial['product'].product_user:
+            initial['owner'] = CustomUserModel.objects.get(pk=self.request.user.id)
+        else:
+            initial['owner'] = initial['product'].product_user
+
+        initial['recipient'] = CustomUserModel.objects.get(pk=self.request.user.id)
+        return initial
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['product'] = ProductModel.objects.filter(pk = self.kwargs['pk']).first()
+        return context
+
+
+def confirm_transfer(request, *args, **kwargs):
+    confirmation = ConfirmationOfTransfer.objects.filter(pk = kwargs['pk']).first()
+    product = confirmation.product
+    product.product_user = confirmation.recipient
+    product.localization = confirmation.recipient.localization
+    product.save()
+    confirmation.delete()
+    return redirect('profile')
+
+def reject_transfer(request, *args, **kwargs):
+    confirmation = ConfirmationOfTransfer.objects.filter(pk = kwargs['pk']).first()
+    confirmation.delete()
+    return redirect('profile')

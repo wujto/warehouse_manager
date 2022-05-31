@@ -24,18 +24,7 @@
         <div id= 'main'>
             {% block main_content %}
 
-                <h2>My tools: {{user.products.all | length}}</h2>
-                {% if user.products.all %}
-                    <ul>
-                        {% for tool in user.products.all %}
-                            <a href ="{{ tool.get_absolute_url}}"><li>{{tool.name}}<br>
-                                {{tool.description}}
-                            </li></a>
-                        {% endfor%}
-                    </ul>
-                {% else %}
-                    You have not any tools yet.
-                {% endif %}
+                
                 
             {% endblock %}
         </div>
@@ -46,9 +35,32 @@
 
         <div id= 'news'>
             {% block 'news_content'%}
-            
-            Treść diva news.
-            Tutaj będą prośby o przeniesienie sprzętu i może kiedyś wiadomośći
+                <h3>Sended confirmations:</h3>
+                {% for confirmation in user.owned_confirmations.all %}
+                    <div class='confirmation'>
+                        Product: {{ confirmation.product }}<br>
+                        Recipient: {{confirmation.recipient}}<br>
+                        Date: {{confirmation.date}}<br>
+                        <a class='reject-confirmation' href= '{% url "transfer_reject" confirmation.id %}'>-</a>
+                    </div>
+
+                {% empty %}
+                    You have not any confirmation
+                {% endfor %}
+
+
+                <h3>Recived confirmations:</h3>
+                {% for confirmation in user.recipient_confirmations.all %}
+                    <div class='confirmation'>
+                        Product: {{ confirmation.product }}<br>
+                        Owner: {{confirmation.owner}}<br>
+                        Date: {{confirmation.date}}<br>
+                        <a class='reject-confirmation' href= '{% url "transfer_reject" confirmation.id %}'>-</a>
+                        <a class='accept-confirmation' href= '{% url "transfer_confirm" confirmation.id %}'>+</a>
+                    </div>
+                {% empty %}
+                    You have not any confirmation
+                {% endfor %}
             {% endblock %}
         </div>
     </div>

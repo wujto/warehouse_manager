@@ -7,6 +7,21 @@ body{
     background-color: #fff;
 }
 
+a{
+    text-decoration: none;
+    color:black;
+}
+
+a:visited{
+    text-decoration: none;
+    color:black;
+}
+
+a:hover{
+    text-decoration: none;
+    color:#f00;
+}
+
 #header{
     width:100%;
 }
@@ -21,6 +36,12 @@ h1{
 h2{
     color: #f00;
     font-size: xx-large;
+    text-shadow: 1px 1px 1px #000;
+}
+
+h3{
+    color: #f00;
+    font-size: x-large;
     text-shadow: 1px 1px 1px #000;
 }
 
@@ -88,4 +109,25 @@ ul{
     width:25%;
     padding: 3px;
     float:left;
+}
+
+.confirmation a{
+    display:inline-block;
+    text-align: center;
+    margin:2px;
+    width:30px;
+    height:30px;
+}
+
+.confirmation .accept-confirmation{
+    font-size: 30px;
+    font-weight: 600;
+    color: black;
+    background-color: greenyellow;
+}
+
+.confirmation .reject-confirmation{
+    font-size: 30px;
+    color: black;
+    background-color: red;
 }
