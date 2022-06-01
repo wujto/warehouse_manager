@@ -14,7 +14,9 @@
                 {{ obj.name}}<br>
                 {{ obj.description}}
             </li></a>
-            <a class='delete-item' href=''>Delete</a>
+            {% if user.is_admin %}
+                <a class='delete-item' href=''>Delete</a>
+            {% endif %}
         {% endfor %}
 
     </ul>

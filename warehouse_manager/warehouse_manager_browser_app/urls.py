@@ -1,5 +1,7 @@
 from django.urls import path, include
-from .views import ProfileView, UsersListView, WarehouseListView, ProductDetailsView, TransferFormView, ProductCreateView, CreateNewCategoryView
+from .views import ProfileView, UsersListView, WarehouseListView, ProductDetailsView, TransferFormView, ProductCreateView
+from .views import CreateNewCategoryView, CreateCustomeUser
+
 from .views import confirm_transfer, reject_transfer
 
 urlpatterns = [
@@ -12,5 +14,6 @@ urlpatterns = [
     path('users', UsersListView.as_view(), name = 'users'),
     path('warehouse', WarehouseListView.as_view(), name = 'warehouse'),
     path('warehouse/add-product', ProductCreateView.as_view(), name = 'add_product'),
-    path('warehouse/add-product/new-category', CreateNewCategoryView.as_view(),name='new_category' )
+    path('warehouse/add-product/new-category', CreateNewCategoryView.as_view(),name='new_category'),
+    path('users/new', CreateCustomeUser.as_view(), name = 'new_user')
 ]

@@ -80,4 +80,10 @@ class CreateNewCategoryView(LoginRequiredMixin, CreateView):
     model = CategoryModel
     fields = '__all__'
     success_url = '/warehouse/add-product'
-    template_name = 'admin/new_category.html'
+    template_name = 'admin/base_form.html'
+
+class CreateCustomeUser(LoginRequiredMixin, CreateView):
+    model = CustomUserModel
+    fields = '__all__'
+    success_url = '/users'
+    template_name = 'admin/base_form.html'

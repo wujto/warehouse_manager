@@ -3,6 +3,9 @@
 {% block main_content %}
 
 <h2>Users: {{object_list | length}}</h2>
+{% if user.is_admin %}
+    <a class = 'new-item' href ='{% url "new_user" %}'>Add user</a><br>
+{% endif %}
 
 {% if object_list %}
     <ul>

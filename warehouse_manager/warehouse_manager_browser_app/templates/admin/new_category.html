@@ -1,7 +1,0 @@
-{% extends 'logged_in/base.html' %}
-{% block main_content %}
-    <form method='post' action=''>{% csrf_token %}
-        {{form.as_p}}
-        <input type = 'submit' value = 'OK'>
-    </form>
-{% endblock %}
