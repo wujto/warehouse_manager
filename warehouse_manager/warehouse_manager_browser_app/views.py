@@ -64,3 +64,20 @@ def reject_transfer(request, *args, **kwargs):
     confirmation = ConfirmationOfTransfer.objects.filter(pk = kwargs['pk']).first()
     confirmation.delete()
     return redirect('profile')
+
+class ProductCreateView(LoginRequiredMixin, CreateView):
+    model= ProductModel
+    fields = '__all__'
+    success_url = '/warehouse'
+    template_name = 'admin/create_product.html'
+
+    def get_initial(self, *args, **kwargs):
+        initial = super().get_initial(*args, **kwargs)
+        initial['localization'] = LocalizationModel.objects.filter(pk=1).first()
+        return initial
+
+class CreateNewCategoryView(LoginRequiredMixin, CreateView):
+    model = CategoryModel
+    fields = '__all__'
+    success_url = '/warehouse/add-product'
+    template_name = 'admin/new_category.html'

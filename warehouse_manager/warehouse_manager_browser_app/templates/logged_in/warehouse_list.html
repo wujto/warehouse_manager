@@ -3,6 +3,9 @@
 {% block main_content %}
 
 <h2>Warehouse: {{object_list | length}}</h2>
+{% if user.is_admin %}
+    <a class = 'new-item' href='{% url "add_product" %}'>Add new item</a>
+{% endif %}
 
 {% if object_list %}
     <ul>
@@ -11,6 +14,7 @@
                 {{ obj.name}}<br>
                 {{ obj.description}}
             </li></a>
+            <a class='delete-item' href=''>Delete</a>
         {% endfor %}
 
     </ul>

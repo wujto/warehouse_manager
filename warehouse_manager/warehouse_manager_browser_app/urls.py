@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import ProfileView, UsersListView, WarehouseListView, ProductDetailsView, TransferFormView
+from .views import ProfileView, UsersListView, WarehouseListView, ProductDetailsView, TransferFormView, ProductCreateView, CreateNewCategoryView
 from .views import confirm_transfer, reject_transfer
 
 urlpatterns = [
@@ -10,5 +10,7 @@ urlpatterns = [
     path('transfer/confirm/<pk>', confirm_transfer, name = 'transfer_confirm'),
     path('transfer/reject/<pk>', reject_transfer, name= 'transfer_reject'),
     path('users', UsersListView.as_view(), name = 'users'),
-    path('warehouse', WarehouseListView.as_view(), name = 'warehouse')
+    path('warehouse', WarehouseListView.as_view(), name = 'warehouse'),
+    path('warehouse/add-product', ProductCreateView.as_view(), name = 'add_product'),
+    path('warehouse/add-product/new-category', CreateNewCategoryView.as_view(),name='new_category' )
 ]
