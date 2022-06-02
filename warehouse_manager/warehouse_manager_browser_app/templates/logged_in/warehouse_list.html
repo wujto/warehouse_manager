@@ -4,7 +4,7 @@
 
 <h2>Warehouse: {{object_list | length}}</h2>
 {% if user.is_admin %}
-    <a class = 'new-item' href='{% url "add_product" %}'>Add new item</a>
+    <a class = 'new-item' href='{% url "add_product" %}'>Add new item</a><br>
 {% endif %}
 
 {% if object_list %}

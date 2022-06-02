@@ -19,21 +19,6 @@ class LocalizationModel(models.Model):
 
     def get_absolute_url(self):
         return reverse('localization_detail', args =[str(self.pk)])
-    
-    def get_edit_url(self):
-        return reverse('localization_update', args =[str(self.pk)])
-
-    def get_delete_url(self):
-        return reverse('localization_delete', args = [str(self.pk)])
-
-    def get_create_url(self):
-        return reverse('localization_create')
-
-    def get_list_url(self):
-        return reverse('localization_list')
-
-    def get_model_name(self):
-        return 'LocalizationModel'
 
 class CategoryModel(models.Model):
     name = models.CharField(unique=True, max_length=15, blank=False, null=False)
@@ -50,21 +35,6 @@ class CategoryModel(models.Model):
     def get_absolute_url(self):
         return reverse('category_detail', args =[str(self.pk)])
 
-    def get_edit_url(self):
-        return reverse('category_update', args = [str(self.pk)])
-
-    def get_delete_url(self):
-        return reverse('category_delete', args = [str(self.pk)])
-    
-    def get_create_url(self):
-        return reverse('category_create')
-
-    def get_list_url(self):
-        return reverse('category_list')
-
-    def get_model_name(self):
-        return 'CategoryModel'
-
 class ProductModel(models.Model):
     id_number = models.CharField(unique=True, max_length=9) #Number to identify product in database
     name = models.CharField(max_length=25, blank=False, null=False)
@@ -76,7 +46,6 @@ class ProductModel(models.Model):
 
     class Meta:
         ordering = ['name']
-        permissions = [('is_manager','Can create, edit and delete')]
         verbose_name = 'product'
         verbose_name_plural = 'products'
 
@@ -99,22 +68,8 @@ class ProductModel(models.Model):
     def get_absolute_url(self):
         return reverse('product_detail', args =[str(self.pk)])
 
-    def get_edit_url(self):
-        return reverse('product_update', args=[str(self.pk)])
-
-    def get_delete_url(self):
-        return reverse('product_delete', args=[str(self.pk)])
-
-    def get_create_url(self):
-        return reverse('product_create')
-
-    def get_list_url(self):
-        return reverse('product_list')
-
-    def get_model_name(self):
-        return 'ProductModel'
-
 class CustomUserManager(BaseUserManager):
+
     def create_user(self, email, password, **extra_fields):
         if not email:
             raise ValueError("The email must be set")
@@ -132,7 +87,7 @@ class CustomUserManager(BaseUserManager):
         email = self.normalize_email(email)
         user = self.model(email = email, **extra_fields)
         user.set_password(password)
-        user.save()
+        user.old_save()
         return user
 
     def create_superuser(self, email, password, **extra_fields):
@@ -162,7 +117,7 @@ class CustomUserModel(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=15, blank=False, null=False)
     last_name = models.CharField(max_length=20, blank=False, null=False)
     phone_number = models.CharField(max_length=9, blank=False, null=False)
-    localization = models.ForeignKey(LocalizationModel, blank=False, null=True, on_delete= models.DO_NOTHING, related_name='users')
+    localization = models.ForeignKey(LocalizationModel,default=None, blank=False, null=True, on_delete= models.SET_DEFAULT, related_name='users')
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -180,21 +135,20 @@ class CustomUserModel(AbstractBaseUser, PermissionsMixin):
 
     def get_absolute_url(self):
         return reverse('user_detail', args =[str(self.pk)])
-    
-    def get_create_url(self):
-        return reverse('user_create')
 
-    def get_edit_url(self):
-        return reverse('user_update', args = [str(self.pk)])
+    def delete(self):
+        for product in self.products.all():
+            product.product_user = None
+            product.save()
+        
+        super().delete()
 
-    def get_delete_url(self):
-        return reverse('user_delete', args = [str(self.pk)])
+    def save(self,*args, **kwargs):
+        self.set_password(self.password)
+        return super().save()
 
-    def get_list_url(self):
-        return reverse('user_list')
-
-    def get_model_name(self):
-        return 'CustomUserModel'
+    def old_save(self):
+        return super().save()
 
 class ConfirmationOfTransfer(models.Model):
     CHOICES = (('PENDING','Pending'),# Waiting for confirm or reject
@@ -219,18 +173,3 @@ class ConfirmationOfTransfer(models.Model):
 
     def get_absolute_url(self):
         return reverse('confirmation_detail', args =[str(self.pk)])
-    
-    def get_create_url(self):
-        return reverse('confirmation_create')
-
-    def get_edit_url(self):
-        return reverse('confirmation_update', args = [str(self.pk)])
-
-    def get_delete_url(self):
-        return reverse('confirmation_delete', args = [str(self.pk)])
-
-    def get_list_url(self):
-        return reverse('confirmation_list')
-
-    def get_model_name(self):
-        return 'ConfirmationOfTransfer'

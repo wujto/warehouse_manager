@@ -15,7 +15,9 @@
             <li><a href = "{% url 'profile' %}">PROFILE</a></li>
             <li><a href='{% url "users" %}'>USERS</a></li>
             <li><a href='{% url "warehouse" %}'>WAREHOUSE</a></li>
+            <li><a href = "{% url 'settings' user.id %}">SETTINGS</a></li>
             <li><a href = "{% url 'logout' %}">LOGOUT</a></li>
+            
         </ul>
     </div>
 

@@ -3,10 +3,11 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from warehouse_manager_base.models import ProductModel, CategoryModel, LocalizationModel, ConfirmationOfTransfer, CustomUserModel
+from .forms import UserUpdateForm
 
 class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'logged_in/profile.html'
@@ -87,3 +88,23 @@ class CreateCustomeUser(LoginRequiredMixin, CreateView):
     fields = '__all__'
     success_url = '/users'
     template_name = 'admin/base_form.html'
+
+class DeleteCustomeUser(LoginRequiredMixin, DeleteView):
+    model = CustomUserModel
+    template_name = 'admin/delete_confirm.html'
+    success_url = '/users'
+
+class UpdateCustomeUser(FormView, LoginRequiredMixin):
+    form_class = UserUpdateForm
+    success_url = '/'
+    template_name = 'admin/base_form.html'
+
+    def form_valid(self, form):
+        super().form_valid(form)
+        if form['old_password'] != '' and form['new_password'] == form['new_password2']:
+            if self.request.user.check_password(form['password']):
+                self.request.user.set_password(form['new_password'])
+        if form['phone_number'] !='':
+            self.request.user.phone_number = form['phone_number']
+            self.request.user.old_save()
+        return redirect('profile')
