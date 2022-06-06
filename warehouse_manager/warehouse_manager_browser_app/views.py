@@ -101,10 +101,13 @@ class UpdateCustomeUser(FormView, LoginRequiredMixin):
 
     def form_valid(self, form):
         super().form_valid(form)
-        if form['old_password'] != '' and form['new_password'] == form['new_password2']:
-            if self.request.user.check_password(form['password']):
-                self.request.user.set_password(form['new_password'])
-        if form['phone_number'] !='':
-            self.request.user.phone_number = form['phone_number']
-            self.request.user.old_save()
+        print(form['phone_number'].value.)
+        # if form['old_password'] != '' and form['new_password'] == form['new_password2']:
+        #     if self.request.user.check_password(form['password']):
+        #         self.request.user.password = form['new_password']
+        #         self.request.user.save_password()
+        # if form['phone_number'] !='':
+        #     self.request.user.phone_number = form['phone_number']
+        
+        # self.request.user.save()
         return redirect('profile')

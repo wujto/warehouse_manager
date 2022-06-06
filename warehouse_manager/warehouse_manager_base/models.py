@@ -86,8 +86,7 @@ class CustomUserManager(BaseUserManager):
         
         email = self.normalize_email(email)
         user = self.model(email = email, **extra_fields)
-        user.set_password(password)
-        user.old_save()
+        user.save()
         return user
 
     def create_superuser(self, email, password, **extra_fields):
@@ -143,11 +142,8 @@ class CustomUserModel(AbstractBaseUser, PermissionsMixin):
         
         super().delete()
 
-    def save(self,*args, **kwargs):
+    def save_password(self,*args, **kwargs):
         self.set_password(self.password)
-        return super().save()
-
-    def old_save(self):
         return super().save()
 
 class ConfirmationOfTransfer(models.Model):
