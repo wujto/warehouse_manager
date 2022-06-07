@@ -89,6 +89,12 @@ class CreateCustomeUser(LoginRequiredMixin, CreateView):
     success_url = '/users'
     template_name = 'admin/base_form.html'
 
+    def form_valid(self, form):
+        super().form_valid(form)
+        self.object.set_password(form['password'].value())
+        self.object.save_password()
+        return redirect('users')
+
 class DeleteCustomeUser(LoginRequiredMixin, DeleteView):
     model = CustomUserModel
     template_name = 'admin/delete_confirm.html'
@@ -100,14 +106,13 @@ class UpdateCustomeUser(FormView, LoginRequiredMixin):
     template_name = 'admin/base_form.html'
 
     def form_valid(self, form):
-        super().form_valid(form)
-        print(form['phone_number'].value.)
-        # if form['old_password'] != '' and form['new_password'] == form['new_password2']:
-        #     if self.request.user.check_password(form['password']):
-        #         self.request.user.password = form['new_password']
-        #         self.request.user.save_password()
-        # if form['phone_number'] !='':
-        #     self.request.user.phone_number = form['phone_number']
+        print(form['phone_number'].value())
+        if form['old_password'].value() != '' and form['new_password'].value() == form['new_password2'].value():
+            if self.request.user.check_password(form['old_password'].value()):
+                self.request.user.password = form['new_password'].value()
+                self.request.user.save_password()
+        if form['phone_number'].value() !='':
+            self.request.user.phone_number = form['phone_number'].value()
         
-        # self.request.user.save()
-        return redirect('profile')
+        self.request.user.save()
+        return super().form_valid(form)
