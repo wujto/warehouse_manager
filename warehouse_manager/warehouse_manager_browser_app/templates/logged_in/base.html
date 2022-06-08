@@ -23,7 +23,8 @@
 
     <div id='content'>
         <div id= 'main'>
-            <b>Email:</b>{{user.email}}&nbsp;&nbsp; <b>Phone number:</b>{{user.phone_number}}&nbsp;&nbsp; ({{user.localization}})
+            <b>{{user.first_name}} {{user.last_name}}</b>&nbsp;&nbsp;<b>Email:</b>{{user.email}}&nbsp;&nbsp;
+             <b>Phone number:</b>{{user.phone_number}}&nbsp;&nbsp; {% if user.is_admin %} (ADMIN) {% else %} (STAFF) {% endif %}
             {% block main_content %}
 
                 

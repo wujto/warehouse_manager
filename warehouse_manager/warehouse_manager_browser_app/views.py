@@ -116,3 +116,13 @@ class UpdateCustomeUser(FormView, LoginRequiredMixin):
         
         self.request.user.save()
         return super().form_valid(form)
+
+class UserDetailView(DetailView, LoginRequiredMixin):
+    model = CustomUserModel
+    template_name = 'logged_in/user_detail.html'
+
+class UpdateUserPermissionView(UpdateView, LoginRequiredMixin):
+    model = CustomUserModel
+    template_name = 'admin/base_form.html'
+    fields = ('is_admin',)
+    success_url = '/users'
