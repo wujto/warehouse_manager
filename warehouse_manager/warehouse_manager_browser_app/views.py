@@ -4,7 +4,7 @@ from django.views.generic import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 from warehouse_manager_base.models import ProductModel, CategoryModel, LocalizationModel, ConfirmationOfTransfer, CustomUserModel
 from .forms import UserUpdateForm
@@ -66,7 +66,7 @@ def reject_transfer(request, *args, **kwargs):
     confirmation.delete()
     return redirect('profile')
 
-class ProductCreateView(LoginRequiredMixin, CreateView):
+class ProductCreateView(LoginRequiredMixin, CreateView, PermissionRequiredMixin):
     model= ProductModel
     fields = '__all__'
     success_url = '/warehouse'
@@ -77,28 +77,41 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
         initial['localization'] = LocalizationModel.objects.filter(pk=1).first()
         return initial
 
-class CreateNewCategoryView(LoginRequiredMixin, CreateView):
+    def has_permission(self):
+        return self.requset.user.is_admin
+
+class CreateNewCategoryView(LoginRequiredMixin, CreateView, PermissionRequiredMixin):
     model = CategoryModel
     fields = '__all__'
     success_url = '/warehouse/add-product'
     template_name = 'admin/base_form.html'
 
-class CreateCustomeUser(LoginRequiredMixin, CreateView):
+    def has_permission(self):
+        return self.requset.user.is_admin
+
+class CreateCustomeUser(LoginRequiredMixin, CreateView, PermissionRequiredMixin):
     model = CustomUserModel
     fields = '__all__'
     success_url = '/users'
     template_name = 'admin/base_form.html'
 
     def form_valid(self, form):
-        super().form_valid(form)
-        self.object.set_password(form['password'].value())
-        self.object.save_password()
+        if self.request.user.is_admin:
+            super().form_valid(form)
+            self.object.set_password(form['password'].value())
+            self.object.save_password()
         return redirect('users')
 
-class DeleteCustomeUser(LoginRequiredMixin, DeleteView):
+    def has_permission(self):
+        return self.requset.user.is_admin
+
+class DeleteCustomeUser(LoginRequiredMixin, DeleteView, PermissionRequiredMixin):
     model = CustomUserModel
     template_name = 'admin/delete_confirm.html'
     success_url = '/users'
+
+    def has_permission(self):
+        return self.requset.user.is_admin
 
 class UpdateCustomeUser(FormView, LoginRequiredMixin):
     form_class = UserUpdateForm
@@ -106,7 +119,6 @@ class UpdateCustomeUser(FormView, LoginRequiredMixin):
     template_name = 'admin/base_form.html'
 
     def form_valid(self, form):
-        print(form['phone_number'].value())
         if form['old_password'].value() != '' and form['new_password'].value() == form['new_password2'].value():
             if self.request.user.check_password(form['old_password'].value()):
                 self.request.user.password = form['new_password'].value()
@@ -121,8 +133,11 @@ class UserDetailView(DetailView, LoginRequiredMixin):
     model = CustomUserModel
     template_name = 'logged_in/user_detail.html'
 
-class UpdateUserPermissionView(UpdateView, LoginRequiredMixin):
+class UpdateUserPermissionView(UpdateView, LoginRequiredMixin, PermissionRequiredMixin):
     model = CustomUserModel
     template_name = 'admin/base_form.html'
     fields = ('is_admin',)
     success_url = '/users'
+
+    def has_permission(self):
+        return self.requset.user.is_admin
