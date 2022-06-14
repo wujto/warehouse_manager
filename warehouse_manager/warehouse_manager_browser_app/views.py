@@ -4,10 +4,17 @@ from django.views.generic import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, AccessMixin
 
 from warehouse_manager_base.models import ProductModel, CategoryModel, LocalizationModel, ConfirmationOfTransfer, CustomUserModel
 from .forms import UserUpdateForm
+
+class AdminAccessMixin(PermissionRequiredMixin):
+    def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.is_admin:
+            return redirect('/')
+
+        return super().dispatch(request, *args, **kwargs)
 
 class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'logged_in/profile.html'
@@ -66,7 +73,7 @@ def reject_transfer(request, *args, **kwargs):
     confirmation.delete()
     return redirect('profile')
 
-class ProductCreateView(LoginRequiredMixin, CreateView, PermissionRequiredMixin):
+class ProductCreateView(LoginRequiredMixin, CreateView, AdminAccessMixin):
     model= ProductModel
     fields = '__all__'
     success_url = '/warehouse'
@@ -77,19 +84,13 @@ class ProductCreateView(LoginRequiredMixin, CreateView, PermissionRequiredMixin)
         initial['localization'] = LocalizationModel.objects.filter(pk=1).first()
         return initial
 
-    def has_permission(self):
-        return self.requset.user.is_admin
-
-class CreateNewCategoryView(LoginRequiredMixin, CreateView, PermissionRequiredMixin):
+class CreateNewCategoryView(LoginRequiredMixin, CreateView, AdminAccessMixin):
     model = CategoryModel
     fields = '__all__'
     success_url = '/warehouse/add-product'
     template_name = 'admin/base_form.html'
 
-    def has_permission(self):
-        return self.requset.user.is_admin
-
-class CreateCustomeUser(LoginRequiredMixin, CreateView, PermissionRequiredMixin):
+class CreateCustomeUser(LoginRequiredMixin, CreateView, AdminAccessMixin):
     model = CustomUserModel
     fields = '__all__'
     success_url = '/users'
@@ -102,16 +103,10 @@ class CreateCustomeUser(LoginRequiredMixin, CreateView, PermissionRequiredMixin)
             self.object.save_password()
         return redirect('users')
 
-    def has_permission(self):
-        return self.requset.user.is_admin
-
-class DeleteCustomeUser(LoginRequiredMixin, DeleteView, PermissionRequiredMixin):
+class DeleteCustomeUser(LoginRequiredMixin, DeleteView, AdminAccessMixin):
     model = CustomUserModel
     template_name = 'admin/delete_confirm.html'
     success_url = '/users'
-
-    def has_permission(self):
-        return self.requset.user.is_admin
 
 class UpdateCustomeUser(FormView, LoginRequiredMixin):
     form_class = UserUpdateForm
@@ -133,11 +128,8 @@ class UserDetailView(DetailView, LoginRequiredMixin):
     model = CustomUserModel
     template_name = 'logged_in/user_detail.html'
 
-class UpdateUserPermissionView(UpdateView, LoginRequiredMixin, PermissionRequiredMixin):
+class UpdateUserPermissionView(UpdateView, LoginRequiredMixin, AdminAccessMixin):
     model = CustomUserModel
     template_name = 'admin/base_form.html'
     fields = ('is_admin',)
     success_url = '/users'
-
-    def has_permission(self):
-        return self.requset.user.is_admin
