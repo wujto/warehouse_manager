@@ -10,6 +10,7 @@ from warehouse_manager_base.models import ProductModel, CategoryModel, Localizat
 from .forms import UserUpdateForm
 
 class AdminAccessMixin(PermissionRequiredMixin):
+
     def dispatch(self, request, *args, **kwargs):
         if not self.request.user.is_admin:
             return redirect('/')
@@ -73,7 +74,7 @@ def reject_transfer(request, *args, **kwargs):
     confirmation.delete()
     return redirect('profile')
 
-class ProductCreateView(LoginRequiredMixin, CreateView, AdminAccessMixin):
+class ProductCreateView(AdminAccessMixin, LoginRequiredMixin, CreateView):
     model= ProductModel
     fields = '__all__'
     success_url = '/warehouse'
@@ -82,28 +83,29 @@ class ProductCreateView(LoginRequiredMixin, CreateView, AdminAccessMixin):
     def get_initial(self, *args, **kwargs):
         initial = super().get_initial(*args, **kwargs)
         initial['localization'] = LocalizationModel.objects.filter(pk=1).first()
+        initial['product_owner'] = CustomUserModel.objects.filter(pk = 1).first()
         return initial
 
-class CreateNewCategoryView(LoginRequiredMixin, CreateView, AdminAccessMixin):
+class CreateNewCategoryView(AdminAccessMixin, LoginRequiredMixin, CreateView):
     model = CategoryModel
     fields = '__all__'
     success_url = '/warehouse/add-product'
     template_name = 'admin/base_form.html'
 
-class CreateCustomeUser(LoginRequiredMixin, CreateView, AdminAccessMixin):
+class CreateCustomeUser(AdminAccessMixin, LoginRequiredMixin, CreateView):
     model = CustomUserModel
-    fields = '__all__'
+    fields = ('first_name', 'last_name','email', 'password', 'phone_number' ,'is_manager', 'is_admin',)
     success_url = '/users'
     template_name = 'admin/base_form.html'
 
     def form_valid(self, form):
         if self.request.user.is_admin:
             super().form_valid(form)
-            self.object.set_password(form['password'].value())
+            self.object.password = form['password'].value()
             self.object.save_password()
         return redirect('users')
 
-class DeleteCustomeUser(LoginRequiredMixin, DeleteView, AdminAccessMixin):
+class DeleteCustomeUser(AdminAccessMixin, LoginRequiredMixin, DeleteView):
     model = CustomUserModel
     template_name = 'admin/delete_confirm.html'
     success_url = '/users'
@@ -128,8 +130,9 @@ class UserDetailView(DetailView, LoginRequiredMixin):
     model = CustomUserModel
     template_name = 'logged_in/user_detail.html'
 
-class UpdateUserPermissionView(UpdateView, LoginRequiredMixin, AdminAccessMixin):
+class UpdateUserPermissionView(AdminAccessMixin, UpdateView, LoginRequiredMixin):
     model = CustomUserModel
     template_name = 'admin/base_form.html'
     fields = ('is_admin',)
     success_url = '/users'
+

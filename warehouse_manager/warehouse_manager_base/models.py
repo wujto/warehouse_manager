@@ -117,7 +117,7 @@ class CustomUserModel(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=15, blank=False, null=False)
     last_name = models.CharField(max_length=20, blank=False, null=False)
     phone_number = models.CharField(max_length=9, blank=False, null=False)
-    localization = models.ForeignKey(LocalizationModel,default=None, blank=False, null=True, on_delete= models.SET_DEFAULT, related_name='users')
+    localization = models.ForeignKey(LocalizationModel,default=1, blank=False, null=True, on_delete= models.SET_DEFAULT, related_name='users')
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
