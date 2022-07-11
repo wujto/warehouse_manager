@@ -1,0 +1,17 @@
+{% extends 'logged_in/base.html' %}
+
+{% block main_content %}
+    <h2>Details:</h2>
+    <b>Name:</b>{{object.name}}<br>
+    <b>Description:</b>{{object.description}}<br>
+    <b>Category:</b>{{object.category}}<br>
+    <b>Localization:</b>{{object.localization}}<br>
+    <b>User:</b>{{object.product_user}}<br>
+    {% if object in user.products.all %}
+        <a method = 'post' href = '{% url "transfer" object.id %}'>Przenieś</a>
+    {% elif object.localization.pk == 1 %}
+        <a href='{% url "transfer" object.id %}'>Pobierz</a>
+    {% else %}
+        Tu może coś kiedyś będzie :)
+    {% endif %}
+{% endblock %}

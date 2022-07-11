@@ -1,0 +1,30 @@
+{% extends 'logged_in/base.html' %}
+
+{% block main_content %}
+
+    {% if user.id == product.product_user.id %}
+        <h2>Transfer:</h2>
+        <form method = 'post'>{% csrf_token %}
+            <b>Product:</b> {{product.name}}<br>
+            <b>Owner:</b> {{user}}<br>
+            {{form.product.as_hidden}}
+            {{form.owner.as_hidden}}
+            <b>Recipient:</b> {{form.recipient}}<br>
+            <input type = 'submit' value = 'OK'>
+        </form>
+
+    {% else %}
+    
+        <h2>Get product</h2>
+        <b>{{product.name}}</b><br>
+        Are you shure?
+        <form method='post'>{% csrf_token %}
+            {{form.product.as_hidden}}
+            {{form.owner.as_hidden}}
+            {{form.recipient.as_hidden}}
+            <input type='submit' value= 'Yes'>
+        </form>
+
+    {% endif %}
+
+{% endblock %}

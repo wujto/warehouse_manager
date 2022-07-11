@@ -3,177 +3,133 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, AccessMixin
 
-from warehouse_manager_base.models import ProductModel, CategoryModel, LocalizationModel, ProductSetModel, ConfirmationOfTransfer, CustomUserModel
+from warehouse_manager_base.models import ProductModel, CategoryModel, LocalizationModel, ConfirmationOfTransfer, CustomUserModel
+from .forms import UserUpdateForm
 
-class ProductListView(ListView):
-    model = ProductModel
-    template_name = 'list.html'
+class AdminAccessMixin(PermissionRequiredMixin):
+    def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.is_admin:
+            return redirect('/')
 
-class ProductCreateView(CreateView):
-    model = ProductModel
-    fields = ['id_number', 'name', 'description', 'category','localization', 'photo']
-    template_name = 'create.html'
+        return super().dispatch(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['item'] ='product' 
+class ProfileView(LoginRequiredMixin, TemplateView):
+    template_name = 'logged_in/profile.html'
+
+class UsersListView(LoginRequiredMixin, TemplateView):
+    template_name = 'logged_in/users_list.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['object_list'] = CustomUserModel.objects.all()
         return context
 
-class ProductDetailView(DetailView):
+class WarehouseListView(LoginRequiredMixin, ListView):
+    queryset = ProductModel.objects.filter(localization = 1)
+    template_name = 'logged_in/warehouse_list.html'
+
+class ProductDetailsView(LoginRequiredMixin, DetailView):
     model = ProductModel
-    template_name = 'product_detail.html'
+    template_name = 'logged_in/details.html'
 
-class ProductUpdateView(UpdateView):
-    model = ProductModel
-    template_name = 'update.html'
-    fields = ['name', 'description', 'category','localization', 'photo', 'product_set', 'product_user']
-
-class ProductDeleteView(DeleteView):
-    model = ProductModel
-    success_url = reverse_lazy('product_list')
-    template_name= 'delete.html'
-
-class CategoryListView(ListView):
-    model = CategoryModel
-    template_name = 'list.html'
-
-class CategoryCreateView(CreateView):
-    model = CategoryModel
-    fields = ['name','description']
-    template_name = 'create.html'
-
-class CategoryDetailView(DetailView):
-    model = CategoryModel
-    template_name = 'category_localization_detail.html'
-
-class CategoryUpdateView(UpdateView):
-    model = CategoryModel
-    fields = ['name', 'description']
-    template_name = 'update.html'
-
-class CategoryDeleteView(DeleteView):
-    model = CategoryModel
-    success_url = reverse_lazy('category_list')
-    template_name = 'delete.html'
-
-class LocalizationCreateView(CreateView):
-    model = LocalizationModel
-    fields = ['name', 'description']
-    template_name = 'create.html'
-
-class LocalizationListView(ListView):
-    model = LocalizationModel
-    template_name = 'list.html'
-
-class LocalizationDetailView(DetailView):
-    model = LocalizationModel
-    template_name = 'category_localization_detail.html'
-
-class LocalizationUpdateView(UpdateView):
-    model = LocalizationModel
-    template_name = 'update.html'
-
-class LocalizationDeleteView(DeleteView):
-    model = LocalizationModel
-    template_name = 'delete.html'
-    success_url = reverse_lazy('localization_list')
-
-class ProductSetListView(ListView):
-    model = ProductSetModel
-    template_name = 'list.html'
-
-class ProductSetCreateView(CreateView):
-    model = ProductSetModel
-    fields = ['id_number', 'name', 'description']
-    template_name = 'create.html'
-
-class ProductSetDetailView(DetailView):
-    model = ProductSetModel
-    template_name = 'productset_detail.html'
-
-class ProductSetUpdateView(UpdateView):
-    model = ProductSetModel
-    fields = ['name', 'description']
-    template_name = 'update.html'
-
-class ProductSetDeleteView(DeleteView):
-    model = ProductSetModel
-    template_name = 'delete.html'
-    success_url = reverse_lazy('product_set_list')
-
-class ConfirmationListView(ListView):
+class TransferFormView(LoginRequiredMixin, CreateView):
     model = ConfirmationOfTransfer
-    template_name = 'list.html'
+    template_name = 'logged_in/transfer.html'
+    fields = ['product', 'owner','recipient']
+    success_url = '/'
 
-class ConfirmationCreateView(CreateView):
-    model = ConfirmationOfTransfer
-    fields = ['product','recipient']
-    template_name = 'create.html'
-
-class ConfirmationDetailView(DetailView):
-    model = ConfirmationOfTransfer
-    template_name = 'confirmation_detail.html'
-
-class ConfirmationUpdateView(UpdateView):
-    model = ConfirmationOfTransfer
-    fields = ['product', 'recipient']
-    template_name = 'update.html'
-
-class ConfirmationDeleteView(DeleteView):
-    model = ConfirmationOfTransfer
-    template_name = 'delete.html'
-    success_url = reverse_lazy('confirmation_list')
-
-class UserListView(ListView):
-    model = CustomUserModel
-    template_name = 'list.html'
-
-class UserCreateView(CreateView):
-    model = CustomUserModel
-    fields = ['email', 'password', 'first_name', 'last_name', 'phone_number']
-    template_name = 'create.html'
-
-    def post(self, request, *args, **kwargs):
-        data = {'first_name':request.POST['first_name'],
-        'last_name': request.POST['last_name'],
-        'phone_number': request.POST['phone_number']}
-        u = self.model.objects.create_user(request.POST['email'],request.POST['password'], **data)
-        return redirect(reverse_lazy('user_detail', args = [str(u.pk)]))
-
-class UserDetailView(DetailView):
-    model = CustomUserModel
-    template_name = 'user_detail.html'
-
-class UserUpdateView(UpdateView):
-    model = CustomUserModel
-    fields = ['password', 'first_name', 'last_name', 'phone_number', 'is_admin', 'is_manager', 'user_permissions']
-    template_name = 'update.html'
-    
     def get_initial(self):
-        initial = super().get_initial()
-        initial['password'] = ''
+        initial = {}
+        initial['product'] = ProductModel.objects.filter(pk = self.kwargs['pk']).first()
+        
+        if not initial['product'].product_user:
+            initial['owner'] = CustomUserModel.objects.get(pk=self.request.user.id)
+        else:
+            initial['owner'] = initial['product'].product_user
+
+        initial['recipient'] = CustomUserModel.objects.get(pk=self.request.user.id)
         return initial
 
-    def post(self, request, *args, **kwargs):
-        u =self.get_object()
-        u.first_name = request.POST['first_name']
-        u.last_name = request.POST['last_name']
-        u.phone_number = request.POST['phone_number']
-        if request.POST['password']:
-            u.set_password(request.POST['password'])
-        u.save()
-        return redirect(reverse_lazy('user_detail', args = [str(u.pk)]))
-
-class UserDeleteView(DeleteView):
-    model = CustomUserModel
-    success_url = reverse_lazy('user_list')
-    template_name = 'delete.html'
-
-class ProfileView(TemplateView):
-    template_name = 'base.html'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['product'] = ProductModel.objects.filter(pk = self.kwargs['pk']).first()
         return context
+
+
+def confirm_transfer(request, *args, **kwargs):
+    confirmation = ConfirmationOfTransfer.objects.filter(pk = kwargs['pk']).first()
+    product = confirmation.product
+    product.product_user = confirmation.recipient
+    product.localization = confirmation.recipient.localization
+    product.save()
+    confirmation.delete()
+    return redirect('profile')
+
+def reject_transfer(request, *args, **kwargs):
+    confirmation = ConfirmationOfTransfer.objects.filter(pk = kwargs['pk']).first()
+    confirmation.delete()
+    return redirect('profile')
+
+class ProductCreateView(LoginRequiredMixin, CreateView, AdminAccessMixin):
+    model= ProductModel
+    fields = '__all__'
+    success_url = '/warehouse'
+    template_name = 'admin/create_product.html'
+
+    def get_initial(self, *args, **kwargs):
+        initial = super().get_initial(*args, **kwargs)
+        initial['localization'] = LocalizationModel.objects.filter(pk=1).first()
+        return initial
+
+class CreateNewCategoryView(LoginRequiredMixin, CreateView, AdminAccessMixin):
+    model = CategoryModel
+    fields = '__all__'
+    success_url = '/warehouse/add-product'
+    template_name = 'admin/base_form.html'
+
+class CreateCustomeUser(LoginRequiredMixin, CreateView, AdminAccessMixin):
+    model = CustomUserModel
+    fields = '__all__'
+    success_url = '/users'
+    template_name = 'admin/base_form.html'
+
+    def form_valid(self, form):
+        if self.request.user.is_admin:
+            super().form_valid(form)
+            self.object.set_password(form['password'].value())
+            self.object.save_password()
+        return redirect('users')
+
+class DeleteCustomeUser(LoginRequiredMixin, DeleteView, AdminAccessMixin):
+    model = CustomUserModel
+    template_name = 'admin/delete_confirm.html'
+    success_url = '/users'
+
+class UpdateCustomeUser(FormView, LoginRequiredMixin):
+    form_class = UserUpdateForm
+    success_url = '/'
+    template_name = 'admin/base_form.html'
+
+    def form_valid(self, form):
+        if form['old_password'].value() != '' and form['new_password'].value() == form['new_password2'].value():
+            if self.request.user.check_password(form['old_password'].value()):
+                self.request.user.password = form['new_password'].value()
+                self.request.user.save_password()
+        if form['phone_number'].value() !='':
+            self.request.user.phone_number = form['phone_number'].value()
+        
+        self.request.user.save()
+        return super().form_valid(form)
+
+class UserDetailView(DetailView, LoginRequiredMixin):
+    model = CustomUserModel
+    template_name = 'logged_in/user_detail.html'
+
+class UpdateUserPermissionView(UpdateView, LoginRequiredMixin, AdminAccessMixin):
+    model = CustomUserModel
+    template_name = 'admin/base_form.html'
+    fields = ('is_admin',)
+    success_url = '/users'

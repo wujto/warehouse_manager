@@ -1,0 +1,27 @@
+{% extends 'logged_in\base.html' %}
+
+{% block main_content %}
+
+<h2>Warehouse: {{object_list | length}}</h2>
+{% if user.is_admin %}
+    <a class = 'new-item' href='{% url "add_product" %}'>Add new item</a><br>
+{% endif %}
+
+{% if object_list %}
+    <ul>
+        {% for obj in object_list %}
+            <a href = '{{ obj.get_absolute_url}}'><li>
+                {{ obj.name}}<br>
+                {{ obj.description}}
+            </li></a>
+            {% if user.is_admin %}
+                <a class='delete-item' href=''>Delete</a>
+            {% endif %}
+        {% endfor %}
+
+    </ul>
+{% else %}
+    Warehouse is empty
+{% endif%}
+
+{% endblock %}

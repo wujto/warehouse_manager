@@ -101,6 +101,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGIN_REDIRECT_URL = '/'
+
 AUTH_USER_MODEL = 'warehouse_manager_base.CustomUserModel'
 
 
@@ -125,3 +127,5 @@ STATIC_URL = 'warehouse_manager_browser_app/static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+

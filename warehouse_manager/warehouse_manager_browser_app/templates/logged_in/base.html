@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'logged_in/base.css' %}">
+    <title>{{ user.first_name }} {{user.last_name}}</title>
+</head>
+<body>
+    <div id='header'><h1>Warehouse-Manager App</h1></div>
+    <div id='nav'>
+        <ul>
+            <li><a href = "{% url 'profile' %}">PROFILE</a></li>
+            <li><a href='{% url "users" %}'>USERS</a></li>
+            <li><a href='{% url "warehouse" %}'>WAREHOUSE</a></li>
+            <li><a href = "{% url 'settings' user.id %}">SETTINGS</a></li>
+            <li><a href = "{% url 'logout' %}">LOGOUT</a></li>
+            
+        </ul>
+    </div>
+
+    <div id='content'>
+        <div id= 'main'>
+            <b>{{user.first_name}} {{user.last_name}}</b>&nbsp;&nbsp;<b>Email:</b>{{user.email}}&nbsp;&nbsp;
+             <b>Phone number:</b>{{user.phone_number}}&nbsp;&nbsp; {% if user.is_admin %} (ADMIN) {% else %} (STAFF) {% endif %}
+            {% block main_content %}
+
+                
+                
+            {% endblock %}
+        </div>
+
+
+
+
+
+        <div id= 'news'>
+            {% block 'news_content'%}
+                <h3>Sended confirmations:</h3>
+                {% for confirmation in user.owned_confirmations.all %}
+                    <div class='confirmation'>
+                        Product: {{ confirmation.product }}<br>
+                        Recipient: {{confirmation.recipient}}<br>
+                        Date: {{confirmation.date}}<br>
+                        <a class='reject-confirmation' href= '{% url "transfer_reject" confirmation.id %}'>-</a>
+                    </div>
+
+                {% empty %}
+                    You have not any confirmation
+                {% endfor %}
+
+
+                <h3>Recived confirmations:</h3>
+                {% for confirmation in user.recipient_confirmations.all %}
+                    <div class='confirmation'>
+                        Product: {{ confirmation.product }}<br>
+                        Owner: {{confirmation.owner}}<br>
+                        Date: {{confirmation.date}}<br>
+                        <a class='reject-confirmation' href= '{% url "transfer_reject" confirmation.id %}'>-</a>
+                        <a class='accept-confirmation' href= '{% url "transfer_confirm" confirmation.id %}'>+</a>
+                    </div>
+                {% empty %}
+                    You have not any confirmation
+                {% endfor %}
+            {% endblock %}
+        </div>
+    </div>
+</body>
+</html>

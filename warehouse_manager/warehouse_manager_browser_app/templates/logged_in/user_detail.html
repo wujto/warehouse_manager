@@ -1,0 +1,18 @@
+{% extends 'logged_in/base.html' %}
+{% block main_content %}
+<h2>{{object.first_name}}{{object.last_name}}</h2>
+<b>Phone number:</b> {{object.phone_number}}<br>
+<b>Email:</b> {{object.email}}<br>
+<b>Localizaion:</b> {{object.localization}}
+<b>Status:</b>{% if object.is_admin %} (ADMIN) {% else %} (STAFF) {% endif %} 
+{% if user.is_admin %} <a href='{% url "change_permissions" object.id %}'> CHANGE</a>{% endif %}
+<h3>Products:</h3>
+    <ul>
+        {% for product in object.products.all %}
+            <a href = '{{ product.get_absolute_url}}'><li>
+                {{ product.name}}<br>
+                {{ product.description}}
+            </li></a>
+        {% endfor %}
+    </ul>
+{% endblock %}
