@@ -14,7 +14,9 @@
                 {{ obj.first_name}}<br>
                 {{ obj.last_name}}
             </li></a>
-            <a class = 'delete-item' href = '{% url "delete_user" obj.id %}'>Delete User</a>
+            {% if user.is_admin %}
+                <a class = 'delete-item' href = '{% url "delete_user" obj.id %}'>Delete User</a>
+            {% endif %}
         {% endfor %}
 
     </ul>
