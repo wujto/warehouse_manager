@@ -1,0 +1,17 @@
+{% extends 'logged_in/base.html' %}
+
+{% block main_content %}
+    <h2>My tools: {{user.products.all | length}}</h2>
+    {% if user.products.all %}
+        <ul>
+            {% for tool in user.products.all %}
+                <a href ="{{ tool.get_absolute_url}}"><li>{{tool.name}}<br>
+                    {{tool.description}}
+                </li></a>
+            {% endfor%}
+        </ul>
+    {% else %}
+        You have not any tools yet.
+    {% endif %}
+
+{% endblock %}

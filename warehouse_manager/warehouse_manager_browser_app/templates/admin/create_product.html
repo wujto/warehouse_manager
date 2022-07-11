@@ -1,0 +1,16 @@
+{% extends 'logged_in/base.html' %}
+
+{% block main_content %}
+    <h2>Add new item:</h2>
+    <form method='post' action=''>
+        {% csrf_token %}
+        Category: {{ form.category}} <a class='add_product' href='{% url "new_category" %}'>New category</a><br>
+        ID Number: {{form.id_number }}<br>
+        Name: {{form.name}}<br>
+        Description: {{form.description}}<br>
+        Localization: {{form.localization}}
+        {{form.photo.as_hidden}}
+        {{form.product_user.as_hidden}}
+        <input type='submit' value= 'Add'>
+    </form>
+{% endblock %}

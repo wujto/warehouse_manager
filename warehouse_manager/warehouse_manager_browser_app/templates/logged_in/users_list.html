@@ -1,0 +1,27 @@
+{% extends 'logged_in\base.html' %}
+
+{% block main_content %}
+
+<h2>Users: {{object_list | length}}</h2>
+{% if user.is_admin %}
+    <a class = 'new-item' href ='{% url "new_user" %}'>Add user</a><br>
+{% endif %}
+
+{% if object_list %}
+    <ul>
+        {% for obj in object_list %}
+            <a href="{% url 'user_detail' obj.id %}"><li>
+                {{ obj.first_name}}<br>
+                {{ obj.last_name}}
+            </li></a>
+            {% if user.is_admin %}
+                <a class = 'delete-item' href = '{% url "delete_user" obj.id %}'>Delete User</a>
+            {% endif %}
+        {% endfor %}
+
+    </ul>
+{% else %}
+    User list is empty
+{% endif%}
+
+{% endblock %}
