@@ -16,8 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from warehouse_manager_browser_app import urls as browser_urls
+from warehouse_manager_restAPI import urls as api_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include(browser_urls)),
+    path('', include( browser_urls )),
+    path('api/', include( api_urls )),
 ]
