@@ -3,10 +3,12 @@ from django.utils import timezone
 from django.urls import reverse
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.utils.text import slugify
 
 class LocalizationModel(models.Model):
     name = models.CharField(unique=True, max_length=25, blank=False, null=False)
     description = models.CharField(max_length=50, default= "")
+    slug = models.SlugField(unique= True, blank= True, null= True)
 
     class Meta:
         ordering = ['name']
@@ -19,6 +21,11 @@ class LocalizationModel(models.Model):
 
     def get_absolute_url(self):
         return reverse('localization_detail', args =[str(self.pk)])
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
 
 class CategoryModel(models.Model):
     name = models.CharField(unique=True, max_length=15, blank=False, null=False)
@@ -107,6 +114,7 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 class CustomUserModel(AbstractBaseUser, PermissionsMixin):
+    slug = models.SlugField(unique= True, blank= True, null= True)
     email = models.EmailField('email adress', unique= True)
     is_staff = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
@@ -146,6 +154,11 @@ class CustomUserModel(AbstractBaseUser, PermissionsMixin):
     def save_password(self,*args, **kwargs):
         self.set_password(self.password)
         return super().save()
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f'{self.first_name} {self.last_name}')
+        return super().save(*args, **kwargs)
 
 class ConfirmationOfTransfer(models.Model):
     CHOICES = (('PENDING','Pending'),# Waiting for confirm or reject
