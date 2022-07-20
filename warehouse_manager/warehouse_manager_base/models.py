@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.text import slugify
+from django.db.models.signals import post_save
 
 class LocalizationModel(models.Model):
     name = models.CharField(unique=True, max_length=25, blank=False, null=False)
@@ -183,3 +184,17 @@ class ConfirmationOfTransfer(models.Model):
 
     def get_absolute_url(self):
         return reverse('confirmation_detail', args =[str(self.pk)])
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.status is self.CHOICES[1]:
+            self.owner.products.remove(self.product)
+            self.recipient.products.add(self.product)
+            self.localization.add(self.owner.localization)
+            self.owner.save()
+            self.recipient.save()
+            self.delete()
+        elif self.status is self.CHOICES[2]:
+            self.delete()
+        
+        return self
