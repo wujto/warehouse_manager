@@ -2,7 +2,7 @@ from http.client import HTTPResponse
 from tokenize import Token
 from urllib.request import Request
 from django.contrib.auth import authenticate
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseNotModified
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
@@ -14,6 +14,7 @@ from rest_framework.status import (
 )
 from rest_framework.response import Response
 from rest_framework import viewsets 
+from rest_framework.decorators import action
 from warehouse_manager_base.models import LocalizationModel, CustomUserModel, ProductModel, CategoryModel, ConfirmationOfTransfer
 from .serializers import LocalizationSerializer, CustomeUserModelSerializer, ProductSerializer, CategorySerializer
 from .serializers import  ConfirmationOfTransferSerializer
@@ -37,15 +38,6 @@ def login(request):
                     status=HTTP_200_OK)
 
 
-class ProfileViewset(viewsets.ModelViewSet):
-    queryset = CustomUserModel.objects.all()
-    serializer_class = CustomeUserModelSerializer
-
-    def get_queryset(self):
-        profile = CustomUserModel.objects.filter(pk = self.request.user.id)
-        return profile
-
-
 class LocalizationListViewset(viewsets.ModelViewSet):
     queryset = LocalizationModel.objects.all()
     serializer_class = LocalizationSerializer
@@ -54,6 +46,37 @@ class LocalizationListViewset(viewsets.ModelViewSet):
 class UserListView(viewsets.ReadOnlyModelViewSet):
     serializer_class = CustomeUserModelSerializer
     queryset = CustomUserModel.objects.all()
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user = request.user
+
+        if not instance.id == user.id:
+            return HttpResponseNotAllowed()
+        instance.email = request.data.get('email', instance.email)
+        instance.first_name = request.data.get('first_name', instance.first_name)
+        instance.last_name = request.data.get('last_name', instance.last_name)
+        instance.phone_number = request.data.get('phone_number', instance.phone_number)
+        instance.save()
+        return HttpResponse(HTTP_200_OK)
+
+    @action(methods = ['put'], detail = True)
+    def change_password(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user = request.user
+
+        if not instance.id == user.id:
+            return HttpResponseNotAllowed('you have not permissions to do that')
+
+        password = request.data.get('password')
+        password2 = request.data.get('password2')
+
+        if password == password2 and len(password) > 0:
+            instance.password = password
+            instance.save_password(*args, **kwargs)
+            return HttpResponse(HTTP_200_OK)
+        
+        return HttpResponseNotModified()
 
 
 class ProductViewset(viewsets.ModelViewSet):
