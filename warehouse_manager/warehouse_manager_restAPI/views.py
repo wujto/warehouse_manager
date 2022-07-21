@@ -1,6 +1,4 @@
-from http.client import HTTPResponse
 from tokenize import Token
-from urllib.request import Request
 from django.contrib.auth import authenticate
 from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseNotModified
 from django.views.decorators.csrf import csrf_exempt
