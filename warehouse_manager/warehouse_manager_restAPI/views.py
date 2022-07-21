@@ -97,11 +97,17 @@ class ConfirmationOfTransferViewset(viewsets.ModelViewSet):
         owner = request.user
         recipient = CustomUserModel.objects.filter(id = request.data['recipient']).first()
         product = ProductModel.objects.filter(id = request.data['product']).first()
-        instance = ConfirmationOfTransfer.objects.create(owner = owner, recipient = recipient, product = product)
-        instance.save()
-        return HttpResponse(HTTP_200_OK)
+        if owner is product.product_owner:
+            instance = ConfirmationOfTransfer.objects.create(owner = owner, recipient = recipient, product = product)
+            instance.save()
+            return HttpResponse(HTTP_200_OK)
+        
+        return HttpResponse(HTTP_400_BAD_REQUEST)
 
     def update(self, request, *args, **kwargs):
+        if not (request.user is confirmation.owner or request.user is confirmation.recipient):
+            return HttpResponseNotModified()
+            
         confirmation = self.get_object()
         confirmation.status = confirmation.CHOICES[int(request.data['status'])]
         confirmation.save()
