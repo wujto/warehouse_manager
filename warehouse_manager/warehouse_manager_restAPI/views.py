@@ -6,7 +6,7 @@ from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseNotMod
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_404_NOT_FOUND,
@@ -18,6 +18,7 @@ from rest_framework.decorators import action
 from warehouse_manager_base.models import LocalizationModel, CustomUserModel, ProductModel, CategoryModel, ConfirmationOfTransfer
 from .serializers import LocalizationSerializer, CustomeUserModelSerializer, ProductSerializer, CategorySerializer
 from .serializers import  ConfirmationOfTransferSerializer
+from .permissions import IsOwnerOrRecipient, LocalizationViewsetPermission, UserListViewsetPermission, IsAdminOrReadOnly
 
 
 @csrf_exempt
@@ -41,11 +42,13 @@ def login(request):
 class LocalizationListViewset(viewsets.ModelViewSet):
     queryset = LocalizationModel.objects.all()
     serializer_class = LocalizationSerializer
+    permission_classes = (IsAuthenticated, LocalizationViewsetPermission)
 
 
-class UserListView(viewsets.ReadOnlyModelViewSet):
+class UserListView(viewsets.ModelViewSet):
     serializer_class = CustomeUserModelSerializer
     queryset = CustomUserModel.objects.all()
+    permission_classes = (IsAuthenticated, UserListViewsetPermission)
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -82,16 +85,19 @@ class UserListView(viewsets.ReadOnlyModelViewSet):
 class ProductViewset(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     queryset = ProductModel.objects.all()
+    permission_classes = (IsAuthenticated, IsAdminOrReadOnly)
 
 
 class CategoryViewset(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     queryset = CategoryModel.objects.all()
+    permission_classes = (IsAuthenticated, IsAdminOrReadOnly)
 
 
 class ConfirmationOfTransferViewset(viewsets.ModelViewSet):
     serializer_class = ConfirmationOfTransferSerializer
     queryset = ConfirmationOfTransfer.objects.all()
+    permission_classes = (IsAuthenticated, IsOwnerOrRecipient)
 
     def create(self, request, *args, **kwargs):
         owner = request.user
@@ -107,7 +113,7 @@ class ConfirmationOfTransferViewset(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         if not (request.user is confirmation.owner or request.user is confirmation.recipient):
             return HttpResponseNotModified()
-            
+
         confirmation = self.get_object()
         confirmation.status = confirmation.CHOICES[int(request.data['status'])]
         confirmation.save()
